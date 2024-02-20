@@ -1,17 +1,18 @@
 import psycopg
 
 import contextlib
+import glob
 import json
 import os
 import subprocess
 
 class DB:
-    FOOTBALL_PATH_       = 'football'
-    FOOTBALL_REPOSITORY_ = 'https://github.com/statsbomb/open-data'
-    FOOTBALL_COMMIT_     = '0067cae166a56aa80b2ef18f61e16158d6a7359a'
-    DATABASE_NAME_       = 'comp_3005_project'
-    DATABASE_USERNAME_   = 'postgres'
-    DATABASE_PASSWORD_   = 'password'
+    OB_NAME_       = 'football'
+    OB_REPOSITORY_ = 'https://github.com/statsbomb/open-data'
+    OB_COMMIT_     = '0067cae166a56aa80b2ef18f61e16158d6a7359a'
+    DB_NAME_       = 'comp_3005_project'
+    DB_USERNAME_   = 'postgres'
+    DB_PASSWORD_   = 'password'
 
     def __init__(self):
         try:
@@ -19,20 +20,17 @@ class DB:
         except Exception as e:
             print(e)
 
-    def download(self):
+    def load(self):
         try:
             self.download_()
+            # self.load_('', lambda x: '')
         except Exception as e:
             print(e)
 
-    def load(self):
-        pass
-
-    @staticmethod
     @contextlib.contextmanager
-    def cd_(directory):
+    def cd_(self, path):
         previous = os.getcwd()
-        os.chdir(directory)
+        os.chdir(path)
         try:
             yield
         finally:
@@ -40,36 +38,43 @@ class DB:
 
     def open_(self):
         self.connection = psycopg.connect(
-            'dbname={database} '
+            'dbname={name} '
             'user={username} '
             'password={password} '
             .format(
-                database=self.DATABASE_NAME_,
-                username=self.DATABASE_USERNAME_,
-                password=self.DATABASE_PASSWORD_
+                name=self.DB_NAME_,
+                username=self.DB_USERNAME_,
+                password=self.DB_PASSWORD_
             )
         )
 
     def download_(self):
-        if os.path.exists(self.FOOTBALL_PATH_):
-            pass
+        if os.path.exists(self.OB_NAME_):
+            return
         subprocess.run([
             'git',
             'clone',
-            '--depth',
-            '1',
             '--single-branch',
-            self.FOOTBALL_REPOSITORY_,
-            self.FOOTBALL_PATH_
+            self.OB_REPOSITORY_,
+            self.OB_NAME_
         ])
-        with self.cd_(self.FOOTBALL_PATH_):
+        with self.cd_(self.OB_NAME_):
             subprocess.run([
                 'git',
-                'checkout',
-                self.FOOTBALL_COMMIT_
+                'reset',
+                '--hard',
+                self.OB_COMMIT_
             ])
+
+    def load_(self, name, function):
+        search = os.path.join(self.OB_NAME_, 'data', name, '**', '*.json')
+        for path in glob.glob(search, recursive=True):
+            try:
+                with open(path, 'r', encoding='utf-8') as file:
+                    function(json.load(file))
+            except Exception as e:
+                print(e)
 
 if __name__ == '__main__':
     db = DB()
-    db.download()
     db.load()
