@@ -2,6 +2,7 @@ import psycopg
 
 import contextlib
 import functools
+import glob
 import json
 import os
 import subprocess
@@ -12,7 +13,6 @@ DATABASE = 'football'
 USERNAME = 'football'
 PASSWORD = 'password'
 
-# All of the seasons required to complete the queries
 SEASONS = [
     '2003/2004',
     '2018/2019',
@@ -21,6 +21,7 @@ SEASONS = [
 ]
 
 connection = ''
+cursor = ''
 
 @contextlib.contextmanager
 def cd(path):
@@ -31,53 +32,16 @@ def cd(path):
     finally:
         os.chdir(previous)
 
-def force_cwd(function):
+def set_cwd(function):
     @functools.wraps(function)
     def _(*args, **kwargs):
         path = os.path.dirname(os.path.abspath(__file__))
-        os.chdir(path)
-        return function(*args, **kwargs)
+        with cd(path):
+            return function(*args, **kwargs)
     return _
 
-def open_database():
-    global connection
-    connection = psycopg.connect(
-        'dbname=' + DATABASE + ' '
-        'user=' + USERNAME + ' '
-        'password=' + PASSWORD + ' '
-    )
-
-def create_database_tables():
-    with connection.cursor() as cursor:
-        cursor.execute('DROP TABLE IF EXISTS Seasons')
-        cursor.execute('DROP TABLE IF EXISTS Teams')
-        cursor.execute('DROP TABLE IF EXISTS Players')
-        cursor.execute(
-            'CREATE TABLE Seasons ('
-            '    id INT PRIMARY KEY,'
-            '    name VARCHAR(10)'
-            ');'
-        )
-        cursor.execute(
-            'CREATE TABLE Teams ('
-            '    id INT PRIMARY KEY'
-            ');'
-        )
-        cursor.execute(
-            'CREATE TABLE Players ('
-            '    season INT,'
-            '    team INT,'
-            '    FOREIGN KEY (season) REFERENCES Seasons(id),'
-            '    FOREIGN KEY (team) REFERENCES Teams(id)'
-            ');'
-        )
-
-@force_cwd
-def populate_database():
-    # if os.path.exists('json'):
-    #     return
-
-    # Start with basic metadata
+@set_cwd
+def sparse_download():
     subprocess.run([
         'git',
         'clone',
@@ -88,8 +52,6 @@ def populate_database():
     ])
 
     with cd('json'):
-
-        # Clone the root to determine what matches are required
         subprocess.run([
             'git',
             'sparse-checkout',
@@ -107,15 +69,14 @@ def populate_database():
         lineups = []
         matches = []
 
-        # Clone the required matches
         path = os.path.join('data', 'competitions.json')
         with open(path, 'r', encoding='utf-8') as file:
             data = json.load(file)
         for item in data:
-            if item['season_name'] not in SEASONS:
-                continue
-            matches.append('data/matches/' + str(item['competition_id']) + '/' +
-                str(item['season_id']) + '.json')
+            if item['season_name'] in SEASONS:
+                competition = str(item['competition_id'])
+                season = str(item['season_id'])
+                matches.append('data/matches/' + competition + '/' + season + '.json')
         subprocess.run([
             'git',
             'sparse-checkout',
@@ -123,7 +84,6 @@ def populate_database():
             '--no-cone',
         ] + matches)
 
-        # Clone the required events and lineups
         for path in matches:
             path = os.path.normpath(path)
             with open(path, 'r', encoding='utf-8') as file:
@@ -138,9 +98,93 @@ def populate_database():
             '--no-cone',
         ] + events + lineups)
 
-        # TODO: populate events and lineups
+def open_database():
+    global connection
+    global cursor
+    connection = psycopg.connect(
+        'dbname=' + DATABASE + ' '
+        'user=' + USERNAME + ' '
+        'password=' + PASSWORD + ' '
+    )
+    cursor = connection.cursor()
+
+def create_database_tables():
+    cursor.execute('DROP TABLE IF EXISTS Players')
+    cursor.execute('DROP TABLE IF EXISTS Seasons')
+    cursor.execute('DROP TABLE IF EXISTS Teams')
+    cursor.execute(
+        'CREATE TABLE Seasons ( '
+        '    id SERIAL PRIMARY KEY, '
+        '    name VARCHAR(10) UNIQUE '
+        '); '
+    )
+    cursor.execute(
+        'CREATE TABLE Teams ( '
+        '    id SERIAL PRIMARY KEY, '
+        '    name VARCHAR(64) UNIQUE '
+        '); '
+    )
+    cursor.execute(
+        'CREATE TABLE Players ( '
+        '    name VARCHAR(128), '
+        '    season INT, '
+        '    team INT, '
+        '    FOREIGN KEY (season) REFERENCES Seasons (id), '
+        '    FOREIGN KEY (team) REFERENCES Teams (id) '
+        '); '
+    )
+
+def parse_lineups(path, season):
+    with open(path, 'r', encoding='utf-8') as file:
+        data = json.load(file)
+    for item in data:
+        cursor.execute(
+            'INSERT INTO Teams (name) '
+            'VALUES (%s) '
+            'ON CONFLICT (name) DO UPDATE '
+            'SET name = Teams.name '
+            'RETURNING *; ',
+            (item['team_name'],)
+        )
+        team = cursor.fetchone()[0]
+        for player in item['lineup']:
+            cursor.execute(
+                'INSERT INTO Players (name, season, team) '
+                'VALUES (%s, %s, %s); ',
+                (player['player_name'], season, team)
+            )
+
+@set_cwd
+def populate_tables():
+    with cd('json'):
+        matches = glob.glob(os.path.join('data', 'matches', '**', '*.json'))
+        for path in matches:
+            with open(path, 'r', encoding='utf-8') as file:
+                data = json.load(file)
+            for item in data:
+                cursor.execute(
+                    'INSERT INTO Seasons (name) '
+                    'VALUES (%s) '
+                    'ON CONFLICT (name) DO UPDATE '
+                    'SET name = Seasons.name '
+                    'RETURNING *; ',
+                    (item['season']['season_name'],)
+                )
+                season = cursor.fetchone()[0]
+                path = 'data/lineups/' + str(item['match_id']) + '.json'
+                parse_lineups(path, season)
 
 if __name__ == '__main__':
+    # sparse_download()
     open_database()
     create_database_tables()
-    populate_database()
+    populate_tables()
+
+    cursor.execute('SELECT * FROM Players')
+    rows = cursor.fetchall()
+    for col_desc in cursor.description:
+        print(col_desc[0])
+    for row in rows:
+        for value in row:
+            print(value, end=' ')
+        print()
