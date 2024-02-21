@@ -120,17 +120,19 @@ def create_database_tables():
     )
     cursor.execute(
         'CREATE TABLE Teams ( '
-        '    id SERIAL PRIMARY KEY, '
-        '    name VARCHAR(64) UNIQUE '
+        '    id INT PRIMARY KEY, '
+        '    name VARCHAR(64) '
         '); '
     )
     cursor.execute(
         'CREATE TABLE Players ( '
         '    name VARCHAR(128), '
+        '    id INT, '
         '    season INT, '
         '    team INT, '
         '    FOREIGN KEY (season) REFERENCES Seasons (id), '
-        '    FOREIGN KEY (team) REFERENCES Teams (id) '
+        '    FOREIGN KEY (team) REFERENCES Teams (id), '
+        '    UNIQUE (id, season, team) '
         '); '
     )
 
@@ -138,20 +140,19 @@ def parse_lineups(path, season):
     with open(path, 'r', encoding='utf-8') as file:
         data = json.load(file)
     for item in data:
+        team = item['team_id']
         cursor.execute(
-            'INSERT INTO Teams (name) '
-            'VALUES (%s) '
-            'ON CONFLICT (name) DO UPDATE '
-            'SET name = Teams.name '
-            'RETURNING *; ',
-            (item['team_name'],)
+            'INSERT INTO Teams (id, name) '
+            'VALUES (%s, %s) '
+            'ON CONFLICT DO NOTHING; ',
+            (team, item['team_name'])
         )
-        team = cursor.fetchone()[0]
         for player in item['lineup']:
             cursor.execute(
-                'INSERT INTO Players (name, season, team) '
-                'VALUES (%s, %s, %s); ',
-                (player['player_name'], season, team)
+                'INSERT INTO Players (name, id, season, team) '
+                'VALUES (%s, %s, %s, %s) '
+                'ON CONFLICT DO NOTHING; ',
+                (player['player_name'], player['player_id'], season, team)
             )
 
 @set_cwd
@@ -186,5 +187,8 @@ if __name__ == '__main__':
         print(col_desc[0])
     for row in rows:
         for value in row:
-            print(value, end=' ')
+            try:
+                print(value, end=' ')
+            except:
+                pass
         print()
