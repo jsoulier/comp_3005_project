@@ -81,8 +81,9 @@ def sparse_download():
                 continue
             competition_id = str(item['competition_id'])
             season_id = str(item['season_id'])
-            m1.append('/data/matches/' + competition_id + '/' + season_id + '.json')
-            m2.append('data/matches/' + competition_id + '/' + season_id + '.json')
+            path = 'data/matches/' + competition_id + '/' + season_id + '.json'
+            m1.append('/' + path)
+            m2.append(path)
         subprocess.run([
             'git',
             'sparse-checkout',
@@ -122,7 +123,7 @@ def quit_database():
     cursor.close()
     connection.close()
 
-def create_database_tables():
+def create_tables():
     cursor.execute('DROP TABLE IF EXISTS Players')
     cursor.execute('DROP TABLE IF EXISTS Seasons')
     cursor.execute('DROP TABLE IF EXISTS Teams')
@@ -148,6 +149,7 @@ def create_database_tables():
         '    team_id INT, '
         '    shots INT DEFAULT 0, '
         '    first_time_shots INT DEFAULT 0, '
+        '    passes INT DEFAULT 0, '
         '    FOREIGN KEY (season_id) REFERENCES Seasons (season_id), '
         '    FOREIGN KEY (team_id) REFERENCES Teams (team_id), '
         '    CONSTRAINT player_unique UNIQUE (player_id, season_id) '
@@ -180,18 +182,27 @@ def parse_e(path, season_id):
     with open(path, 'r', encoding='utf-8') as file:
         data = json.load(file)
     for item in data:
-        if 'shot' in item:
-            player_id = item['player']['id']
-            cursor.execute(
-                'UPDATE Players '
-                'SET shots = shots + 1 '
-                'WHERE player_id = %s AND season_id = %s; ',
-                (player_id, season_id)
-            )
-            if 'first_time' in item['shot']:
+        match item['type']['id']:
+            case 16: # shot
+                player_id = item['player']['id']
                 cursor.execute(
                     'UPDATE Players '
-                    'SET first_time_shots = first_time_shots + 1 '
+                    'SET shots = shots + 1 '
+                    'WHERE player_id = %s AND season_id = %s; ',
+                    (player_id, season_id)
+                )
+                if 'first_time' in item['shot']:
+                    cursor.execute(
+                        'UPDATE Players '
+                        'SET first_time_shots = first_time_shots + 1 '
+                        'WHERE player_id = %s AND season_id = %s; ',
+                        (player_id, season_id)
+                    )
+            case 30: # pass
+                player_id = item['player']['id']
+                cursor.execute(
+                    'UPDATE Players '
+                    'SET passes = passes + 1 '
                     'WHERE player_id = %s AND season_id = %s; ',
                     (player_id, season_id)
                 )
@@ -221,7 +232,7 @@ def populate_tables():
                 parse_l(l, season_id)
                 parse_e(e, season_id)
 
-def csvify(name):
+def to_csv(name):
     cols = [description[0] for description in cursor.description]
     rows = cursor.fetchall()
     with open(name + '.csv', 'w', encoding='utf-8') as file:
@@ -232,6 +243,6 @@ def csvify(name):
 if __name__ == '__main__':
     sparse_download()
     open_database()
-    create_database_tables()
+    create_tables()
     populate_tables()
     quit_database()
