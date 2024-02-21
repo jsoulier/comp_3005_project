@@ -73,10 +73,11 @@ def sparse_download():
         with open(path, 'r', encoding='utf-8') as file:
             data = json.load(file)
         for item in data:
-            if item['season_name'] in SEASONS:
-                competition = str(item['competition_id'])
-                season = str(item['season_id'])
-                matches.append('data/matches/' + competition + '/' + season + '.json')
+            if item['season_name'] not in SEASONS:
+                continue
+            competition = str(item['competition_id'])
+            season = str(item['season_id'])
+            matches.append('data/matches/' + competition + '/' + season + '.json')
         subprocess.run([
             'git',
             'sparse-checkout',
@@ -130,7 +131,8 @@ def create_database_tables():
         '    id INT, '
         '    season INT, '
         '    team INT, '
-        '    played INT DEFAULT 1, '
+        '    games_played INT DEFAULT 1, '
+        '    goals_scored INT DEFAULT 0, '
         '    FOREIGN KEY (season) REFERENCES Seasons (id), '
         '    FOREIGN KEY (team) REFERENCES Teams (id), '
         '    CONSTRAINT uniqueness UNIQUE (id, season, team) '
@@ -153,7 +155,7 @@ def parse_lineups(path, season):
                 'INSERT INTO Players (name, id, season, team) '
                 'VALUES (%s, %s, %s, %s) '
                 'ON CONFLICT ON CONSTRAINT uniqueness DO UPDATE '
-                'SET played = Players.played + 1; ',
+                'SET games_played = Players.games_played + 1; ',
                 (player['player_name'], player['player_id'], season, team)
             )
 
@@ -161,7 +163,15 @@ def parse_events(path, season):
     with open(path, 'r', encoding='utf-8') as file:
         data = json.load(file)
     for item in data:
-        pass
+        if 'shot' not in item:
+            continue
+        if item['shot']['outcome']['name'] == 'Goal':
+            cursor.execute(
+                'UPDATE Players '
+                'SET goals_scored = goals_scored + 1 '
+                'WHERE id = %s AND season = %s AND team = %s; ',
+                (item['player']['id'], season, item['team']['id'])
+            )
 
 @set_cwd
 def populate_tables():
