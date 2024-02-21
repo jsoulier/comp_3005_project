@@ -137,6 +137,32 @@ def create_database_tables():
         '); '
     )
 
+def parse_lineups(path, season):
+    with open(path, 'r', encoding='utf-8') as file:
+        data = json.load(file)
+    for item in data:
+        team = item['team_id']
+        cursor.execute(
+            'INSERT INTO Teams (id, name) '
+            'VALUES (%s, %s) '
+            'ON CONFLICT DO NOTHING; ',
+            (team, item['team_name'])
+        )
+        for player in item['lineup']:
+            cursor.execute(
+                'INSERT INTO Players (name, id, season, team) '
+                'VALUES (%s, %s, %s, %s) '
+                'ON CONFLICT ON CONSTRAINT uniqueness DO UPDATE '
+                'SET played = Players.played + 1; ',
+                (player['player_name'], player['player_id'], season, team)
+            )
+
+def parse_events(path, season):
+    with open(path, 'r', encoding='utf-8') as file:
+        data = json.load(file)
+    for item in data:
+        pass
+
 @set_cwd
 def populate_tables():
     with cd('json'):
@@ -154,33 +180,10 @@ def populate_tables():
                     (item['season']['season_name'],)
                 )
                 season = cursor.fetchone()[0]
-
-                path1 = 'data/lineups/' + str(item['match_id']) + '.json'
-                path2 = 'data/events/' + str(item['match_id']) + '.json'
-
-                with open(path1, 'r', encoding='utf-8') as file:
-                    data = json.load(file)
-                for item in data:
-                    team = item['team_id']
-                    cursor.execute(
-                        'INSERT INTO Teams (id, name) '
-                        'VALUES (%s, %s) '
-                        'ON CONFLICT DO NOTHING; ',
-                        (team, item['team_name'])
-                    )
-                    for player in item['lineup']:
-                        cursor.execute(
-                            'INSERT INTO Players (name, id, season, team) '
-                            'VALUES (%s, %s, %s, %s) '
-                            'ON CONFLICT ON CONSTRAINT uniqueness DO UPDATE '
-                            'SET played = Players.played + 1; ',
-                            (player['player_name'], player['player_id'], season, team)
-                        )
-
-                # with open(path2, 'r', encoding='utf-8') as file:
-                #     data = json.load(file)
-                # for item in data:
-                #     pass
+                lineups = 'data/lineups/' + str(item['match_id']) + '.json'
+                events = 'data/events/' + str(item['match_id']) + '.json'
+                parse_lineups(lineups, season)
+                parse_events(events, season)
 
 if __name__ == '__main__':
     # sparse_download()
