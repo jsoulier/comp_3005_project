@@ -21,8 +21,8 @@ SEASONS = [
     ('Premier League', '2003/2004'),
 ]
 
-connection = ''
-cursor = ''
+connection = None
+cursor = None
 
 @contextlib.contextmanager
 def cd(path):
@@ -150,6 +150,8 @@ def create_tables():
         '    shots INT DEFAULT 0, '
         '    first_time_shots INT DEFAULT 0, '
         '    passes INT DEFAULT 0, '
+        '    recipient_passes INT DEFAULT 0, '
+        '    through_passes INT DEFAULT 0, '
         '    average_xg FLOAT DEFAULT 0, '
         '    FOREIGN KEY (player_id) REFERENCES Names (player_id), '
         '    FOREIGN KEY (season_id) REFERENCES Seasons (season_id), '
@@ -173,6 +175,8 @@ def populate_tables():
     shots = []
     first_time_shots = []
     passes = []
+    recipient_passes = []
+    through_passes = []
     xgs = []
 
     with cd('json'):
@@ -222,6 +226,11 @@ def populate_tables():
                         case 30:
                             player_id = item['player']['id']
                             passes.append((player_id, season_id))
+                            if 'recipient' in item['pass']:
+                                recipient_id = item['pass']['recipient']['id']
+                                recipient_passes.append((recipient_id, season_id))
+                            if 'through_ball' in item['pass']:
+                                through_passes.append((player_id, season_id))
 
     cursor.executemany(
         'INSERT INTO Teams (team_id, team_name) '
@@ -260,6 +269,18 @@ def populate_tables():
         passes
     )
     cursor.executemany(
+        'UPDATE Players '
+        'SET recipient_passes = recipient_passes + 1 '
+        'WHERE player_id = %s AND season_id = %s; ',
+        recipient_passes
+    )
+    cursor.executemany(
+        'UPDATE Players '
+        'SET through_passes = through_passes + 1 '
+        'WHERE player_id = %s AND season_id = %s; ',
+        through_passes
+    )
+    cursor.executemany(
         'INSERT INTO XG (player_id, season_id, xg) '
         'VALUES (%s, %s, %s); ',
         xgs
@@ -278,10 +299,13 @@ def populate_tables():
     )
 
 @set_cwd
-def to_csv(name):
+def to_csv(name, text, args):
+    open_database()
+    cursor.execute(text, args)
     cols = [description[0] for description in cursor.description]
     rows = cursor.fetchall()
     with open(name + '.csv', 'w', encoding='utf-8') as file:
         writer = csv.writer(file, lineterminator='\n')
         writer.writerow(cols)
         writer.writerows(rows)
+    quit_database()
