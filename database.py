@@ -13,6 +13,8 @@ COMMIT = '0067cae166a56aa80b2ef18f61e16158d6a7359a'
 DATABASE = 'football'
 USERNAME = 'football'
 PASSWORD = 'password'
+
+# The seasons and competitions required by the queries
 SEASONS = [
     ('La Liga', '2020/2021'),
     ('La Liga', '2019/2020'),
@@ -59,6 +61,8 @@ def quit_database():
 def sparse_download():
     if os.path.exists('json'):
         return
+
+    # Clone the repository metadata
     subprocess.run([
         'git',
         'clone',
@@ -69,6 +73,7 @@ def sparse_download():
     ])
 
     with cd('json'):
+        # Clone the competitions
         subprocess.run([
             'git',
             'sparse-checkout',
@@ -82,6 +87,7 @@ def sparse_download():
             COMMIT
         ])
 
+        # Clone the required matches
         matches1 = []
         matches2 = []
         path = os.path.join('data', 'competitions.json')
@@ -104,6 +110,7 @@ def sparse_download():
             '--no-cone',
         ] + matches1)
 
+        # Clone the required lineups and events
         events = []
         lineups = []
         for path in matches2:
@@ -123,65 +130,247 @@ def sparse_download():
 
 def create_tables():
     cursor.execute(
-        'DROP TABLE IF EXISTS XG; '
+        'DROP TABLE IF EXISTS BallReceipts; '
+        'DROP TABLE IF EXISTS BallRecoveries; '
+        'DROP TABLE IF EXISTS Dispossessions; '
+        'DROP TABLE IF EXISTS Duels; '
+        'DROP TABLE IF EXISTS CameraOns; '
+        'DROP TABLE IF EXISTS Blocks; '
+        'DROP TABLE IF EXISTS Offsides; '
+        'DROP TABLE IF EXISTS Clearances; '
+        'DROP TABLE IF EXISTS Interceptions; '
+        'DROP TABLE IF EXISTS Dribbles; '
+        'DROP TABLE IF EXISTS Shots; '
+        'DROP TABLE IF EXISTS Pressures; '
+        'DROP TABLE IF EXISTS HalfStarts; '
+        'DROP TABLE IF EXISTS Substitutions; '
+        'DROP TABLE IF EXISTS OwnGoalsAgainst; '
+        'DROP TABLE IF EXISTS FoulsWon; '
+        'DROP TABLE IF EXISTS FoulsCommitted; '
+        'DROP TABLE IF EXISTS GoalKeepers; '
+        'DROP TABLE IF EXISTS BadBehaviours; '
+        'DROP TABLE IF EXISTS OwnGoalsFor; '
+        'DROP TABLE IF EXISTS PlayerOns; '
+        'DROP TABLE IF EXISTS PlayerOffs; '
+        'DROP TABLE IF EXISTS Shields; '
+        'DROP TABLE IF EXISTS Passes; '
+        'DROP TABLE IF EXISTS FiftyFifties; '
+        'DROP TABLE IF EXISTS HalfEnds; '
+        'DROP TABLE IF EXISTS StartingXIs; '
+        'DROP TABLE IF EXISTS TacticalShifts; '
+        'DROP TABLE IF EXISTS Errors; '
+        'DROP TABLE IF EXISTS Miscontrols; '
+        'DROP TABLE IF EXISTS DribbledPasts; '
+        'DROP TABLE IF EXISTS InjuryStoppages; '
+        'DROP TABLE IF EXISTS RefereeBallDrops; '
+        'DROP TABLE IF EXISTS Carries; '
         'DROP TABLE IF EXISTS Players; '
-        'DROP TABLE IF EXISTS Names; '
-        'DROP TABLE IF EXISTS Seasons; '
+        'DROP TABLE IF EXISTS Humans; '
         'DROP TABLE IF EXISTS Teams; '
-        'CREATE TABLE Teams ( '
-        '    team_id INT PRIMARY KEY, '
-        '    team_name VARCHAR(64) '
-        '); '
+        'DROP TABLE IF EXISTS Seasons; '
         'CREATE TABLE Seasons ( '
         '    season_id SERIAL PRIMARY KEY, '
         '    competition_name VARCHAR(15), '
         '    season_name VARCHAR(10), '
         '    CONSTRAINT season_unique UNIQUE (competition_name, season_name) '
         '); '
-        'CREATE TABLE Names ('
-        '    player_id INT PRIMARY KEY, '
-        '    player_name VARCHAR(128) '
+        'CREATE TABLE Humans ( '
+        '    human_id INT PRIMARY KEY, '
+        '    human_name VARCHAR(128) '
         '); '
-        'CREATE TABLE Players ( '
-        '    player_id INT, '
-        '    season_id INT, '
+        'CREATE TABLE Teams ( '
+        '    team_id INT PRIMARY KEY, '
+        '    team_name VARCHAR(128) '
+        '); '
+        'CREATE TABLE Players ('
+        '    player_id SERIAL PRIMARY KEY, '
+        '    human_id INT, '
         '    team_id INT, '
-        '    shots INT DEFAULT 0, '
-        '    first_time_shots INT DEFAULT 0, '
-        '    passes INT DEFAULT 0, '
-        '    recipient_passes INT DEFAULT 0, '
-        '    through_passes INT DEFAULT 0, '
-        '    successful_dribbles INT DEFAULT 0, '
-        '    dribbled_passed INT DEFAULT 0, '
-        '    average_xg FLOAT DEFAULT 0, '
-        '    FOREIGN KEY (player_id) REFERENCES Names (player_id), '
+        '    season_id INT, '
+        '    FOREIGN KEY (human_id) REFERENCES Humans (human_id), '
         '    FOREIGN KEY (season_id) REFERENCES Seasons (season_id), '
         '    FOREIGN KEY (team_id) REFERENCES Teams (team_id), '
-        '    CONSTRAINT player_unique UNIQUE (player_id, season_id) '
+        '    CONSTRAINT player_unique UNIQUE (human_id, season_id, team_id) '
         '); '
-        'CREATE TABLE XG ( '
+        'CREATE TABLE BallReceipts ( '
         '    player_id INT, '
-        '    season_id INT, '
-        '    xg FLOAT, '
-        '    FOREIGN KEY (player_id, season_id) '
-        '    REFERENCES Players (player_id, season_id) '
+        '    FOREIGN KEY (player_id) REFERENCES Players (player_id) '
+        '); '
+        'CREATE TABLE BallRecoveries ( '
+        '    player_id INT, '
+        '    FOREIGN KEY (player_id) REFERENCES Players (player_id) '
+        '); '
+        'CREATE TABLE Dispossessions ( '
+        '    player_id INT, '
+        '    FOREIGN KEY (player_id) REFERENCES Players (player_id) '
+        '); '
+        'CREATE TABLE Duels ( '
+        '    player_id INT, '
+        '    FOREIGN KEY (player_id) REFERENCES Players (player_id) '
+        '); '
+        'CREATE TABLE CameraOns ( '
+        '    player_id INT, '
+        '    FOREIGN KEY (player_id) REFERENCES Players (player_id) '
+        '); '
+        'CREATE TABLE Blocks ( '
+        '    player_id INT, '
+        '    FOREIGN KEY (player_id) REFERENCES Players (player_id) '
+        '); '
+        'CREATE TABLE Offsides ( '
+        '    player_id INT, '
+        '    FOREIGN KEY (player_id) REFERENCES Players (player_id) '
+        '); '
+        'CREATE TABLE Clearances ( '
+        '    player_id INT, '
+        '    FOREIGN KEY (player_id) REFERENCES Players (player_id) '
+        '); '
+        'CREATE TABLE Interceptions ( '
+        '    player_id INT, '
+        '    FOREIGN KEY (player_id) REFERENCES Players (player_id) '
+        '); '
+        'CREATE TABLE Dribbles ( '
+        '    player_id INT, '
+        '    FOREIGN KEY (player_id) REFERENCES Players (player_id) '
+        '); '
+        'CREATE TABLE Shots ( '
+        '    player_id INT, '
+        '    FOREIGN KEY (player_id) REFERENCES Players (player_id) '
+        '); '
+        'CREATE TABLE Pressures ( '
+        '    player_id INT, '
+        '    FOREIGN KEY (player_id) REFERENCES Players (player_id) '
+        '); '
+        'CREATE TABLE HalfStarts ( '
+        '    player_id INT, '
+        '    FOREIGN KEY (player_id) REFERENCES Players (player_id) '
+        '); '
+        'CREATE TABLE Substitutions ( '
+        '    player_id INT, '
+        '    FOREIGN KEY (player_id) REFERENCES Players (player_id) '
+        '); '
+        'CREATE TABLE OwnGoalsAgainst ( '
+        '    player_id INT, '
+        '    FOREIGN KEY (player_id) REFERENCES Players (player_id) '
+        '); '
+        'CREATE TABLE FoulsWon ( '
+        '    player_id INT, '
+        '    FOREIGN KEY (player_id) REFERENCES Players (player_id) '
+        '); '
+        'CREATE TABLE FoulsCommitted ( '
+        '    player_id INT, '
+        '    FOREIGN KEY (player_id) REFERENCES Players (player_id) '
+        '); '
+        'CREATE TABLE GoalKeepers ( '
+        '    player_id INT, '
+        '    FOREIGN KEY (player_id) REFERENCES Players (player_id) '
+        '); '
+        'CREATE TABLE BadBehaviours ( '
+        '    player_id INT, '
+        '    FOREIGN KEY (player_id) REFERENCES Players (player_id) '
+        '); '
+        'CREATE TABLE OwnGoalsFor ( '
+        '    player_id INT, '
+        '    FOREIGN KEY (player_id) REFERENCES Players (player_id) '
+        '); '
+        'CREATE TABLE PlayerOns ( '
+        '    player_id INT, '
+        '    FOREIGN KEY (player_id) REFERENCES Players (player_id) '
+        '); '
+        'CREATE TABLE PlayerOffs ( '
+        '    player_id INT, '
+        '    FOREIGN KEY (player_id) REFERENCES Players (player_id) '
+        '); '
+        'CREATE TABLE Shields ( '
+        '    player_id INT, '
+        '    FOREIGN KEY (player_id) REFERENCES Players (player_id) '
+        '); '
+        'CREATE TABLE Passes ( '
+        '    player_id INT, '
+        '    FOREIGN KEY (player_id) REFERENCES Players (player_id) '
+        '); '
+        'CREATE TABLE FiftyFifties ( '
+        '    player_id INT, '
+        '    FOREIGN KEY (player_id) REFERENCES Players (player_id) '
+        '); '
+        'CREATE TABLE HalfEnds ( '
+        '    player_id INT, '
+        '    FOREIGN KEY (player_id) REFERENCES Players (player_id) '
+        '); '
+        'CREATE TABLE StartingXIs ( '
+        '    player_id INT, '
+        '    FOREIGN KEY (player_id) REFERENCES Players (player_id) '
+        '); '
+        'CREATE TABLE TacticalShifts ( '
+        '    player_id INT, '
+        '    FOREIGN KEY (player_id) REFERENCES Players (player_id) '
+        '); '
+        'CREATE TABLE Errors ( '
+        '    player_id INT, '
+        '    FOREIGN KEY (player_id) REFERENCES Players (player_id) '
+        '); '
+        'CREATE TABLE Miscontrols ( '
+        '    player_id INT, '
+        '    FOREIGN KEY (player_id) REFERENCES Players (player_id) '
+        '); '
+        'CREATE TABLE DribbledPasts ( '
+        '    player_id INT, '
+        '    FOREIGN KEY (player_id) REFERENCES Players (player_id) '
+        '); '
+        'CREATE TABLE InjuryStoppages ( '
+        '    player_id INT, '
+        '    FOREIGN KEY (player_id) REFERENCES Players (player_id) '
+        '); '
+        'CREATE TABLE RefereeBallDrops ( '
+        '    player_id INT, '
+        '    FOREIGN KEY (player_id) REFERENCES Players (player_id) '
+        '); '
+        'CREATE TABLE Carries ( '
+        '    player_id INT, '
+        '    FOREIGN KEY (player_id) REFERENCES Players (player_id) '
         '); '
     )
 
 @set_cwd
 def populate_tables():
-    teams = []
+    humans = []
     players = []
-    names = []
+    teams = []
+    ball_receipts = []
+    ball_recoveries = []
+    dispossessions = []
+    duels = []
+    camera_ons = []
+    blocks = []
+    offsides = []
+    clearances = []
+    interceptions = []
+    dribbles = []
     shots = []
-    first_time_shots = []
+    pressures = []
+    half_starts = []
+    substitutions = []
+    own_goal_sagainst = []
+    fouls_won = []
+    fouls_committed = []
+    goalkeepers = []
+    bad_behaviours = []
+    own_goals_for = []
+    player_ons = []
+    player_offs = []
+    shields = []
     passes = []
-    recipient_passes = []
-    through_passes = []
-    successful_dribbles = []
-    dribbled_passed = []
-    xgs = []
+    fifty_fifties = []
+    half_ends = []
+    starting_xis = []
+    tactical_shifts = []
+    errors = []
+    miscontrols = []
+    dribbled_pasts = []
+    injury_stoppages = []
+    referee_ball_drops = []
+    carries = []
 
+    # Parse the matches
     with cd('json'):
         matches = glob.glob(os.path.join('data', 'matches', '**', '*.json'))
         for path in matches:
@@ -191,6 +380,8 @@ def populate_tables():
                 match_id = str(item['match_id'])
                 competition_name = item['competition']['competition_name']
                 season_name = item['season']['season_name']
+
+                # Get unique id for the season and competition pair
                 cursor.execute(
                     'INSERT INTO Seasons (competition_name, season_name) '
                     'VALUES (%s, %s) '
@@ -201,6 +392,7 @@ def populate_tables():
                 )
                 season_id = cursor.fetchone()[0]
 
+                # Parse the lineups
                 path = 'data/lineups/' + match_id + '.json'
                 with open(path, 'r', encoding='utf-8') as file:
                     data = json.load(file)
@@ -209,38 +401,32 @@ def populate_tables():
                     team_name = item['team_name']
                     teams.append((team_id, team_name))
                     for player in item['lineup']:
-                        player_name = player['player_name']
-                        player_id = player['player_id']
-                        players.append((player_id, season_id, team_id))
-                        names.append((player_id, player_name))
+                        human_name = player['player_name']
+                        human_id = player['player_id']
+                        players.append((human_id, team_id, season_id))
+                        humans.append((human_id, human_name))
 
+                # Parse the events
                 path = 'data/events/' + match_id + '.json'
                 with open(path, 'r', encoding='utf-8') as file:
                     data = json.load(file)
                 for item in data:
-                    match item['type']['id']:
-                        case 16:
-                            player_id = item['player']['id']
-                            statsbomb_xg = item['shot']['statsbomb_xg']
-                            shots.append((player_id, season_id))
-                            xgs.append((player_id, season_id, statsbomb_xg))
-                            if 'first_time' in item['shot']:
-                                first_time_shots.append((player_id, season_id))
-                        case 30:
-                            player_id = item['player']['id']
-                            passes.append((player_id, season_id))
-                            if 'recipient' in item['pass']:
-                                recipient_id = item['pass']['recipient']['id']
-                                recipient_passes.append((recipient_id, season_id))
-                            if 'through_ball' in item['pass']:
-                                through_passes.append((player_id, season_id))
-                        case 14:
-                            player_id = item['player']['id']
-                            if item['dribble']['outcome']['id'] == 8:
-                                successful_dribbles.append((player_id, season_id))
-                        case 39:
-                            player_id = item['player']['id']
-                            dribbled_passed.append((player_id, season_id))
+                    type_id = item['type']['id']
+                    if type_id == 16:
+                        human_id = item['player']['id']
+                        team_id = item['team']['id']
+                        shots.append((human_id, team_id, season_id))
+                        continue
+                    if type_id == 30:
+                        human_id = item['player']['id']
+                        team_id = item['team']['id']
+                        passes.append((human_id, team_id, season_id))
+                        continue
+                    if type_id == 14:
+                        human_id = item['player']['id']
+                        team_id = item['team']['id']
+                        dribbles.append((human_id, team_id, season_id))
+                        continue
 
     cursor.executemany(
         'INSERT INTO Teams (team_id, team_name) '
@@ -249,75 +435,25 @@ def populate_tables():
         teams
     )
     cursor.executemany(
-        'INSERT INTO Names (player_id, player_name) '
+        'INSERT INTO Humans (human_id, human_name) '
         'VALUES (%s, %s) '
         'ON CONFLICT DO NOTHING; ',
-        names
+        humans
     )
     cursor.executemany(
-        'INSERT INTO Players (player_id, season_id, team_id) '
+        'INSERT INTO Players (human_id, team_id, season_id) '
         'VALUES (%s, %s, %s) '
-        'ON CONFLICT DO NOTHING; ',
+        'ON CONFLICT ON CONSTRAINT player_unique DO NOTHING; ',
         players
     )
     cursor.executemany(
-        'UPDATE Players '
-        'SET shots = shots + 1 '
-        'WHERE player_id = %s AND season_id = %s; ',
+        'INSERT INTO Shots (player_id) '
+        'VALUES (('
+        '    SELECT player_id '
+        '    FROM Players '
+        '    WHERE human_id = %s AND team_id = %s AND season_id = %s '
+        '))',
         shots
-    )
-    cursor.executemany(
-        'UPDATE Players '
-        'SET first_time_shots = first_time_shots + 1 '
-        'WHERE player_id = %s AND season_id = %s; ',
-        first_time_shots
-    )
-    cursor.executemany(
-        'UPDATE Players '
-        'SET passes = passes + 1 '
-        'WHERE player_id = %s AND season_id = %s; ',
-        passes
-    )
-    cursor.executemany(
-        'UPDATE Players '
-        'SET recipient_passes = recipient_passes + 1 '
-        'WHERE player_id = %s AND season_id = %s; ',
-        recipient_passes
-    )
-    cursor.executemany(
-        'UPDATE Players '
-        'SET through_passes = through_passes + 1 '
-        'WHERE player_id = %s AND season_id = %s; ',
-        through_passes
-    )
-    cursor.executemany(
-        'UPDATE Players '
-        'SET successful_dribbles = successful_dribbles + 1 '
-        'WHERE player_id = %s AND season_id = %s; ',
-        successful_dribbles
-    )
-    cursor.executemany(
-        'UPDATE Players '
-        'SET dribbled_passed = dribbled_passed + 1 '
-        'WHERE player_id = %s AND season_id = %s; ',
-        dribbled_passed
-    )
-    cursor.executemany(
-        'INSERT INTO XG (player_id, season_id, xg) '
-        'VALUES (%s, %s, %s); ',
-        xgs
-    )
-    cursor.execute(
-        'UPDATE Players '
-        'SET average_xg = AverageXG.average_xg '
-        'FROM ( '
-        '    SELECT player_id, season_id, AVG(xg) as average_xg '
-        '    FROM XG '
-        '    GROUP BY player_id, season_id '
-        ') AS AverageXG '
-        'WHERE '
-        '    Players.player_id = AverageXG.player_id AND '
-        '    Players.season_id = AverageXG.season_id; '
     )
 
 @set_cwd
