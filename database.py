@@ -26,7 +26,6 @@ cursor = ''
 
 @contextlib.contextmanager
 def cd(path):
-    ''' Change directory then revert after exiting block. '''
     previous = os.getcwd()
     os.chdir(path)
     try:
@@ -35,7 +34,6 @@ def cd(path):
         os.chdir(previous)
 
 def set_cwd(function):
-    ''' Set the cwd to the directory of the script. '''
     @functools.wraps(function)
     def _(*args, **kwargs):
         path = os.path.dirname(os.path.abspath(__file__))
@@ -44,7 +42,6 @@ def set_cwd(function):
     return _
 
 def open_database():
-    ''' Create a connection and cursor. '''
     global connection
     global cursor
     connection = psycopg.connect(
@@ -61,7 +58,6 @@ def quit_database():
 
 @set_cwd
 def sparse_download():
-    ''' Clone only the required files. '''
     if os.path.exists('json'):
         return
     subprocess.run([
@@ -127,21 +123,21 @@ def sparse_download():
         ] + events + lineups)
 
 def create_tables():
-    ''' Create new empty tables. '''
     cursor.execute(
+        'DROP TABLE IF EXISTS XG; '
         'DROP TABLE IF EXISTS Players; '
         'DROP TABLE IF EXISTS Names; '
         'DROP TABLE IF EXISTS Seasons; '
         'DROP TABLE IF EXISTS Teams; '
+        'CREATE TABLE Teams ( '
+        '    team_id INT PRIMARY KEY, '
+        '    team_name VARCHAR(64) '
+        '); '
         'CREATE TABLE Seasons ( '
         '    season_id SERIAL PRIMARY KEY, '
         '    competition_name VARCHAR(15), '
         '    season_name VARCHAR(10), '
         '    CONSTRAINT season_unique UNIQUE (competition_name, season_name) '
-        '); '
-        'CREATE TABLE Teams ( '
-        '    team_id INT PRIMARY KEY, '
-        '    team_name VARCHAR(64) '
         '); '
         'CREATE TABLE Names ('
         '    player_id INT PRIMARY KEY, '
@@ -154,22 +150,30 @@ def create_tables():
         '    shots INT DEFAULT 0, '
         '    first_time_shots INT DEFAULT 0, '
         '    passes INT DEFAULT 0, '
+        '    average_xg FLOAT DEFAULT 0, '
         '    FOREIGN KEY (player_id) REFERENCES Names (player_id), '
         '    FOREIGN KEY (season_id) REFERENCES Seasons (season_id), '
         '    FOREIGN KEY (team_id) REFERENCES Teams (team_id), '
         '    CONSTRAINT player_unique UNIQUE (player_id, season_id) '
         '); '
+        'CREATE TABLE XG ( '
+        '    player_id INT, '
+        '    season_id INT, '
+        '    xg FLOAT, '
+        '    FOREIGN KEY (player_id, season_id) '
+        '    REFERENCES Players (player_id, season_id) '
+        '); '
     )
 
 @set_cwd
 def populate_tables():
-    ''' Fill new empty tables. '''
     teams = []
     players = []
     names = []
     shots = []
     first_time_shots = []
     passes = []
+    xgs = []
 
     with cd('json'):
         matches = glob.glob(os.path.join('data', 'matches', '**', '*.json'))
@@ -208,12 +212,14 @@ def populate_tables():
                     data = json.load(file)
                 for item in data:
                     match item['type']['id']:
-                        case 16: # shot
+                        case 16:
                             player_id = item['player']['id']
+                            statsbomb_xg = item['shot']['statsbomb_xg']
                             shots.append((player_id, season_id))
+                            xgs.append((player_id, season_id, statsbomb_xg))
                             if 'first_time' in item['shot']:
                                 first_time_shots.append((player_id, season_id))
-                        case 30: # pass
+                        case 30:
                             player_id = item['player']['id']
                             passes.append((player_id, season_id))
 
@@ -253,20 +259,29 @@ def populate_tables():
         'WHERE player_id = %s AND season_id = %s; ',
         passes
     )
+    cursor.executemany(
+        'INSERT INTO XG (player_id, season_id, xg) '
+        'VALUES (%s, %s, %s); ',
+        xgs
+    )
+    cursor.execute(
+        'UPDATE Players '
+        'SET average_xg = AverageXG.average_xg '
+        'FROM ( '
+        '    SELECT player_id, season_id, AVG(xg) as average_xg '
+        '    FROM XG '
+        '    GROUP BY player_id, season_id '
+        ') AS AverageXG '
+        'WHERE '
+        '    Players.player_id = AverageXG.player_id AND '
+        '    Players.season_id = AverageXG.season_id; '
+    )
 
 @set_cwd
 def to_csv(name):
-    ''' Get the previous query as CSV. '''
     cols = [description[0] for description in cursor.description]
     rows = cursor.fetchall()
     with open(name + '.csv', 'w', encoding='utf-8') as file:
         writer = csv.writer(file, lineterminator='\n')
         writer.writerow(cols)
         writer.writerows(rows)
-
-if __name__ == '__main__':
-    sparse_download()
-    open_database()
-    create_tables()
-    populate_tables()
-    quit_database()
