@@ -13,7 +13,6 @@ COMMIT = '0067cae166a56aa80b2ef18f61e16158d6a7359a'
 DATABASE = 'football'
 USERNAME = 'football'
 PASSWORD = 'password'
-
 SEASONS = [
     ('La Liga', '2020/2021'),
     ('La Liga', '2019/2020'),
@@ -327,7 +326,10 @@ def to_csv(name, text, args):
     cursor.execute(text, args)
     cols = [description[0] for description in cursor.description]
     rows = cursor.fetchall()
-    with open(name + '.csv', 'w', encoding='utf-8') as file:
+    if not os.path.exists('csv'):
+        os.mkdir('csv')
+    path = os.path.join('csv', name + '.csv')
+    with open(path, 'w', encoding='utf-8') as file:
         writer = csv.writer(file, lineterminator='\n')
         writer.writerow(cols)
         writer.writerows(rows)
