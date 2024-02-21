@@ -152,6 +152,8 @@ def create_tables():
         '    passes INT DEFAULT 0, '
         '    recipient_passes INT DEFAULT 0, '
         '    through_passes INT DEFAULT 0, '
+        '    successful_dribbles INT DEFAULT 0, '
+        '    dribbled_passed INT DEFAULT 0, '
         '    average_xg FLOAT DEFAULT 0, '
         '    FOREIGN KEY (player_id) REFERENCES Names (player_id), '
         '    FOREIGN KEY (season_id) REFERENCES Seasons (season_id), '
@@ -177,6 +179,8 @@ def populate_tables():
     passes = []
     recipient_passes = []
     through_passes = []
+    successful_dribbles = []
+    dribbled_passed = []
     xgs = []
 
     with cd('json'):
@@ -231,6 +235,13 @@ def populate_tables():
                                 recipient_passes.append((recipient_id, season_id))
                             if 'through_ball' in item['pass']:
                                 through_passes.append((player_id, season_id))
+                        case 14:
+                            player_id = item['player']['id']
+                            if item['dribble']['outcome']['id'] == 8:
+                                successful_dribbles.append((player_id, season_id))
+                        case 39:
+                            player_id = item['player']['id']
+                            dribbled_passed.append((player_id, season_id))
 
     cursor.executemany(
         'INSERT INTO Teams (team_id, team_name) '
@@ -279,6 +290,18 @@ def populate_tables():
         'SET through_passes = through_passes + 1 '
         'WHERE player_id = %s AND season_id = %s; ',
         through_passes
+    )
+    cursor.executemany(
+        'UPDATE Players '
+        'SET successful_dribbles = successful_dribbles + 1 '
+        'WHERE player_id = %s AND season_id = %s; ',
+        successful_dribbles
+    )
+    cursor.executemany(
+        'UPDATE Players '
+        'SET dribbled_passed = dribbled_passed + 1 '
+        'WHERE player_id = %s AND season_id = %s; ',
+        dribbled_passed
     )
     cursor.executemany(
         'INSERT INTO XG (player_id, season_id, xg) '
