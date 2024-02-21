@@ -2,8 +2,9 @@ import database
 
 database.open_database()
 database.cursor.execute(
-    'SELECT Players.player_name, Players.shots '
+    'SELECT Names.player_name, Players.shots '
     'FROM Players '
+    'JOIN Names ON Players.player_id = Names.player_id '
     'JOIN Seasons ON Players.season_id = Seasons.season_id '
     'WHERE Seasons.competition_name = %s AND Seasons.season_name = %s '
     'ORDER BY shots DESC ',

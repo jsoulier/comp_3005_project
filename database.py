@@ -125,6 +125,7 @@ def quit_database():
 
 def create_tables():
     cursor.execute('DROP TABLE IF EXISTS Players')
+    cursor.execute('DROP TABLE IF EXISTS Names')
     cursor.execute('DROP TABLE IF EXISTS Seasons')
     cursor.execute('DROP TABLE IF EXISTS Teams')
     cursor.execute(
@@ -142,14 +143,20 @@ def create_tables():
         '); '
     )
     cursor.execute(
+        'CREATE TABLE Names ('
+        '    player_id INT PRIMARY KEY, '
+        '    player_name VARCHAR(128) '
+        '); '
+    )
+    cursor.execute(
         'CREATE TABLE Players ( '
-        '    player_name VARCHAR(128), '
         '    player_id INT, '
         '    season_id INT, '
         '    team_id INT, '
         '    shots INT DEFAULT 0, '
         '    first_time_shots INT DEFAULT 0, '
         '    passes INT DEFAULT 0, '
+        '    FOREIGN KEY (player_id) REFERENCES Names (player_id), '
         '    FOREIGN KEY (season_id) REFERENCES Seasons (season_id), '
         '    FOREIGN KEY (team_id) REFERENCES Teams (team_id), '
         '    CONSTRAINT player_unique UNIQUE (player_id, season_id) '
@@ -172,10 +179,16 @@ def parse_l(path, season_id):
             player_name = player['player_name']
             player_id = player['player_id']
             cursor.execute(
-                'INSERT INTO Players (player_name, player_id, season_id, team_id) '
-                'VALUES (%s, %s, %s, %s) '
+                'INSERT INTO Names (player_id, player_name) '
+                'VALUES (%s, %s) '
                 'ON CONFLICT DO NOTHING; ',
-                (player_name, player_id, season_id, team_id)
+                (player_id, player_name)
+            )
+            cursor.execute(
+                'INSERT INTO Players (player_id, season_id, team_id) '
+                'VALUES (%s, %s, %s) '
+                'ON CONFLICT DO NOTHING; ',
+                (player_id, season_id, team_id)
             )
 
 def parse_e(path, season_id):
