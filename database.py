@@ -231,6 +231,7 @@ def create_tables():
         'CREATE TABLE Shots ( '
         '    player_id INT, '
         '    xg FLOAT, '
+        '    first_time BOOLEAN, '
         '    FOREIGN KEY (player_id) REFERENCES Players (player_id) '
         '); '
         'CREATE TABLE Pressures ( '
@@ -439,7 +440,8 @@ def populate_tables():
                         case 16:
                             shot = item['shot']
                             xg = shot['statsbomb_xg']
-                            shots.append((human_id, team_id, season_id, xg))
+                            first_time = 'first_time' in shot
+                            shots.append((human_id, team_id, season_id, xg, first_time))
                         case 17:
                             pressures.append((human_id, team_id, season_id))
                         case 18:
@@ -590,12 +592,12 @@ def populate_tables():
         dribbles
     )
     cursor.executemany(
-        'INSERT INTO Shots (player_id, xg) '
+        'INSERT INTO Shots (player_id, xg, first_time) '
         'VALUES (('
         '    SELECT player_id '
         '    FROM Players '
         '    WHERE human_id = %s AND team_id = %s AND season_id = %s '
-        '), %s)',
+        '), %s, %s)',
         shots
     )
     cursor.executemany(

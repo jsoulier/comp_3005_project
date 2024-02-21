@@ -9,6 +9,6 @@ database.to_csv(
     'JOIN Humans ON Players.human_id = Humans.human_id '
     'WHERE Seasons.competition_name = %s AND Seasons.season_name = %s '
     'GROUP BY Players.player_id, Humans.human_name '
-    'ORDER BY xg DESC',
+    'ORDER BY xg DESC; ',
     ('La Liga', '2020/2021')
 )
