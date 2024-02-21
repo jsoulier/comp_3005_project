@@ -1,6 +1,7 @@
 import psycopg
 
 import contextlib
+import csv
 import functools
 import glob
 import json
@@ -42,6 +43,9 @@ def set_cwd(function):
 
 @set_cwd
 def sparse_download():
+    if os.path.exists('json'):
+        return
+
     subprocess.run([
         'git',
         'clone',
@@ -57,7 +61,7 @@ def sparse_download():
             'sparse-checkout',
             'set',
             '--no-cone',
-            'data/competitions.json'
+            '/data/competitions.json'
         ])
         subprocess.run([
             'git',
@@ -65,10 +69,8 @@ def sparse_download():
             COMMIT
         ])
 
-        e = []
-        l = []
-        m = []
-
+        m1 = []
+        m2 = []
         path = os.path.join('data', 'competitions.json')
         with open(path, 'r', encoding='utf-8') as file:
             data = json.load(file)
@@ -79,22 +81,25 @@ def sparse_download():
                 continue
             competition_id = str(item['competition_id'])
             season_id = str(item['season_id'])
-            m.append('data/matches/' + competition_id + '/' + season_id + '.json')
+            m1.append('/data/matches/' + competition_id + '/' + season_id + '.json')
+            m2.append('data/matches/' + competition_id + '/' + season_id + '.json')
         subprocess.run([
             'git',
             'sparse-checkout',
             'add',
             '--no-cone',
-        ] + m)
+        ] + m1)
 
-        for path in m:
+        e = []
+        l = []
+        for path in m2:
             path = os.path.normpath(path)
             with open(path, 'r', encoding='utf-8') as file:
                 data = json.load(file)
             for item in data:
                 match_id = str(item['match_id'])
-                e.append('data/events/' + match_id + '.json')
-                l.append('data/lineups/' + match_id + '.json')
+                e.append('/data/events/' + match_id + '.json')
+                l.append('/data/lineups/' + match_id + '.json')
         subprocess.run([
             'git',
             'sparse-checkout',
@@ -141,8 +146,8 @@ def create_database_tables():
         '    player_id INT, '
         '    season_id INT, '
         '    team_id INT, '
-        '    games_played INT DEFAULT 1, '
-        '    goals_scored INT DEFAULT 0, '
+        '    shots INT DEFAULT 0, '
+        '    first_time_shots INT DEFAULT 0, '
         '    FOREIGN KEY (season_id) REFERENCES Seasons (season_id), '
         '    FOREIGN KEY (team_id) REFERENCES Teams (team_id), '
         '    CONSTRAINT player_unique UNIQUE (player_id, season_id) '
@@ -167,8 +172,7 @@ def parse_l(path, season_id):
             cursor.execute(
                 'INSERT INTO Players (player_name, player_id, season_id, team_id) '
                 'VALUES (%s, %s, %s, %s) '
-                'ON CONFLICT ON CONSTRAINT player_unique DO UPDATE '
-                'SET games_played = Players.games_played + 1; ',
+                'ON CONFLICT DO NOTHING; ',
                 (player_name, player_id, season_id, team_id)
             )
 
@@ -176,18 +180,21 @@ def parse_e(path, season_id):
     with open(path, 'r', encoding='utf-8') as file:
         data = json.load(file)
     for item in data:
-        # TODO:
-        if 'shot' not in item:
-            continue
-
-        player_id = item['player']['id']
-        if item['shot']['outcome']['name'] == 'Goal':
+        if 'shot' in item:
+            player_id = item['player']['id']
             cursor.execute(
                 'UPDATE Players '
-                'SET goals_scored = goals_scored + 1 '
+                'SET shots = shots + 1 '
                 'WHERE player_id = %s AND season_id = %s; ',
                 (player_id, season_id)
             )
+            if 'first_time' in item['shot']:
+                cursor.execute(
+                    'UPDATE Players '
+                    'SET first_time_shots = first_time_shots + 1 '
+                    'WHERE player_id = %s AND season_id = %s; ',
+                    (player_id, season_id)
+                )
 
 @set_cwd
 def populate_tables():
@@ -214,8 +221,16 @@ def populate_tables():
                 parse_l(l, season_id)
                 parse_e(e, season_id)
 
+def csvify(name):
+    cols = [description[0] for description in cursor.description]
+    rows = cursor.fetchall()
+    with open(name + '.csv', 'w', encoding='utf-8') as file:
+        writer = csv.writer(file, lineterminator='\n')
+        writer.writerow(cols)
+        writer.writerows(rows)
+
 if __name__ == '__main__':
-    # sparse_download()
+    sparse_download()
     open_database()
     create_database_tables()
     populate_tables()
