@@ -14,10 +14,10 @@ USERNAME = 'football'
 PASSWORD = 'password'
 
 SEASONS = [
-    '2003/2004',
-    '2018/2019',
-    '2019/2020',
-    '2020/2021',
+    ('La Liga', '2020/2021'),
+    ('La Liga', '2019/2020'),
+    ('La Liga', '2018/2019'),
+    ('Premier League', '2003/2004'),
 ]
 
 connection = ''
@@ -65,39 +65,42 @@ def sparse_download():
             COMMIT
         ])
 
-        events = []
-        lineups = []
-        matches = []
+        e = []
+        l = []
+        m = []
 
         path = os.path.join('data', 'competitions.json')
         with open(path, 'r', encoding='utf-8') as file:
             data = json.load(file)
         for item in data:
-            if item['season_name'] not in SEASONS:
+            competition_name = item['competition_name']
+            season_name = item['season_name']
+            if (competition_name, season_name) not in SEASONS:
                 continue
-            competition = str(item['competition_id'])
-            season = str(item['season_id'])
-            matches.append('data/matches/' + competition + '/' + season + '.json')
+            competition_id = str(item['competition_id'])
+            season_id = str(item['season_id'])
+            m.append('data/matches/' + competition_id + '/' + season_id + '.json')
         subprocess.run([
             'git',
             'sparse-checkout',
             'add',
             '--no-cone',
-        ] + matches)
+        ] + m)
 
-        for path in matches:
+        for path in m:
             path = os.path.normpath(path)
             with open(path, 'r', encoding='utf-8') as file:
                 data = json.load(file)
             for item in data:
-                events.append('data/events/' + str(item['match_id']) + '.json')
-                lineups.append('data/lineups/' + str(item['match_id']) + '.json')
+                match_id = str(item['match_id'])
+                e.append('data/events/' + match_id + '.json')
+                l.append('data/lineups/' + match_id + '.json')
         subprocess.run([
             'git',
             'sparse-checkout',
             'add',
             '--no-cone',
-        ] + events + lineups)
+        ] + e + l)
 
 def open_database():
     global connection
@@ -109,106 +112,111 @@ def open_database():
     )
     cursor = connection.cursor()
 
+def quit_database():
+    connection.commit()
+    cursor.close()
+    connection.close()
+
 def create_database_tables():
     cursor.execute('DROP TABLE IF EXISTS Players')
     cursor.execute('DROP TABLE IF EXISTS Seasons')
     cursor.execute('DROP TABLE IF EXISTS Teams')
     cursor.execute(
         'CREATE TABLE Seasons ( '
-        '    id SERIAL PRIMARY KEY, '
-        '    name VARCHAR(10) UNIQUE '
+        '    season_id SERIAL PRIMARY KEY, '
+        '    competition_name VARCHAR(15), '
+        '    season_name VARCHAR(10), '
+        '    CONSTRAINT season_unique UNIQUE (competition_name, season_name) '
         '); '
     )
     cursor.execute(
         'CREATE TABLE Teams ( '
-        '    id INT PRIMARY KEY, '
-        '    name VARCHAR(64) '
+        '    team_id INT PRIMARY KEY, '
+        '    team_name VARCHAR(64) '
         '); '
     )
     cursor.execute(
         'CREATE TABLE Players ( '
-        '    name VARCHAR(128), '
-        '    id INT, '
-        '    season INT, '
-        '    team INT, '
+        '    player_name VARCHAR(128), '
+        '    player_id INT, '
+        '    season_id INT, '
+        '    team_id INT, '
         '    games_played INT DEFAULT 1, '
         '    goals_scored INT DEFAULT 0, '
-        '    FOREIGN KEY (season) REFERENCES Seasons (id), '
-        '    FOREIGN KEY (team) REFERENCES Teams (id), '
-        '    CONSTRAINT uniqueness UNIQUE (id, season, team) '
+        '    FOREIGN KEY (season_id) REFERENCES Seasons (season_id), '
+        '    FOREIGN KEY (team_id) REFERENCES Teams (team_id), '
+        '    CONSTRAINT player_unique UNIQUE (player_id, season_id) '
         '); '
     )
 
-def parse_lineups(path, season):
+def parse_l(path, season_id):
     with open(path, 'r', encoding='utf-8') as file:
         data = json.load(file)
     for item in data:
-        team = item['team_id']
+        team_id = item['team_id']
+        team_name = item['team_name']
         cursor.execute(
-            'INSERT INTO Teams (id, name) '
+            'INSERT INTO Teams (team_id, team_name) '
             'VALUES (%s, %s) '
             'ON CONFLICT DO NOTHING; ',
-            (team, item['team_name'])
+            (team_id, team_name)
         )
         for player in item['lineup']:
+            player_name = player['player_name']
+            player_id = player['player_id']
             cursor.execute(
-                'INSERT INTO Players (name, id, season, team) '
+                'INSERT INTO Players (player_name, player_id, season_id, team_id) '
                 'VALUES (%s, %s, %s, %s) '
-                'ON CONFLICT ON CONSTRAINT uniqueness DO UPDATE '
+                'ON CONFLICT ON CONSTRAINT player_unique DO UPDATE '
                 'SET games_played = Players.games_played + 1; ',
-                (player['player_name'], player['player_id'], season, team)
+                (player_name, player_id, season_id, team_id)
             )
 
-def parse_events(path, season):
+def parse_e(path, season_id):
     with open(path, 'r', encoding='utf-8') as file:
         data = json.load(file)
     for item in data:
+        # TODO:
         if 'shot' not in item:
             continue
+
+        player_id = item['player']['id']
         if item['shot']['outcome']['name'] == 'Goal':
             cursor.execute(
                 'UPDATE Players '
                 'SET goals_scored = goals_scored + 1 '
-                'WHERE id = %s AND season = %s AND team = %s; ',
-                (item['player']['id'], season, item['team']['id'])
+                'WHERE player_id = %s AND season_id = %s; ',
+                (player_id, season_id)
             )
 
 @set_cwd
 def populate_tables():
     with cd('json'):
-        matches = glob.glob(os.path.join('data', 'matches', '**', '*.json'))
-        for path in matches:
+        m = glob.glob(os.path.join('data', 'matches', '**', '*.json'))
+        for path in m:
             with open(path, 'r', encoding='utf-8') as file:
                 data = json.load(file)
             for item in data:
+                match_id = str(item['match_id'])
+                competition_name = item['competition']['competition_name']
+                season_name = item['season']['season_name']
                 cursor.execute(
-                    'INSERT INTO Seasons (name) '
-                    'VALUES (%s) '
-                    'ON CONFLICT (name) DO UPDATE '
-                    'SET name = Seasons.name '
+                    'INSERT INTO Seasons (competition_name, season_name) '
+                    'VALUES (%s, %s) '
+                    'ON CONFLICT ON CONSTRAINT season_unique DO UPDATE '
+                    'SET season_name = Seasons.season_name '
                     'RETURNING *; ',
-                    (item['season']['season_name'],)
+                    (competition_name, season_name)
                 )
-                season = cursor.fetchone()[0]
-                lineups = 'data/lineups/' + str(item['match_id']) + '.json'
-                events = 'data/events/' + str(item['match_id']) + '.json'
-                parse_lineups(lineups, season)
-                parse_events(events, season)
+                season_id = cursor.fetchone()[0]
+                l = 'data/lineups/' + match_id + '.json'
+                e = 'data/events/' + match_id + '.json'
+                parse_l(l, season_id)
+                parse_e(e, season_id)
 
 if __name__ == '__main__':
     # sparse_download()
     open_database()
     create_database_tables()
     populate_tables()
-
-    cursor.execute('SELECT * FROM Players')
-    rows = cursor.fetchall()
-    for col_desc in cursor.description:
-        print(col_desc[0])
-    for row in rows:
-        for value in row:
-            try:
-                print(value, end=' ')
-            except:
-                pass
-        print()
+    quit_database()
