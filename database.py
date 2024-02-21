@@ -26,6 +26,7 @@ cursor = ''
 
 @contextlib.contextmanager
 def cd(path):
+    ''' Change directory then revert after exiting block. '''
     previous = os.getcwd()
     os.chdir(path)
     try:
@@ -34,6 +35,7 @@ def cd(path):
         os.chdir(previous)
 
 def set_cwd(function):
+    ''' Set the cwd to the directory of the script. '''
     @functools.wraps(function)
     def _(*args, **kwargs):
         path = os.path.dirname(os.path.abspath(__file__))
@@ -41,11 +43,27 @@ def set_cwd(function):
             return function(*args, **kwargs)
     return _
 
+def open_database():
+    ''' Create a connection and cursor. '''
+    global connection
+    global cursor
+    connection = psycopg.connect(
+        'dbname=' + DATABASE + ' '
+        'user=' + USERNAME + ' '
+        'password=' + PASSWORD + ' '
+    )
+    cursor = connection.cursor()
+
+def quit_database():
+    connection.commit()
+    cursor.close()
+    connection.close()
+
 @set_cwd
 def sparse_download():
+    ''' Clone only the required files. '''
     if os.path.exists('json'):
         return
-
     subprocess.run([
         'git',
         'clone',
@@ -69,8 +87,8 @@ def sparse_download():
             COMMIT
         ])
 
-        m1 = []
-        m2 = []
+        matches1 = []
+        matches2 = []
         path = os.path.join('data', 'competitions.json')
         with open(path, 'r', encoding='utf-8') as file:
             data = json.load(file)
@@ -82,73 +100,53 @@ def sparse_download():
             competition_id = str(item['competition_id'])
             season_id = str(item['season_id'])
             path = 'data/matches/' + competition_id + '/' + season_id + '.json'
-            m1.append('/' + path)
-            m2.append(path)
+            matches1.append('/' + path)
+            matches2.append(path)
         subprocess.run([
             'git',
             'sparse-checkout',
             'add',
             '--no-cone',
-        ] + m1)
+        ] + matches1)
 
-        e = []
-        l = []
-        for path in m2:
+        events = []
+        lineups = []
+        for path in matches2:
             path = os.path.normpath(path)
             with open(path, 'r', encoding='utf-8') as file:
                 data = json.load(file)
             for item in data:
                 match_id = str(item['match_id'])
-                e.append('/data/events/' + match_id + '.json')
-                l.append('/data/lineups/' + match_id + '.json')
+                events.append('/data/events/' + match_id + '.json')
+                lineups.append('/data/lineups/' + match_id + '.json')
         subprocess.run([
             'git',
             'sparse-checkout',
             'add',
             '--no-cone',
-        ] + e + l)
-
-def open_database():
-    global connection
-    global cursor
-    connection = psycopg.connect(
-        'dbname=' + DATABASE + ' '
-        'user=' + USERNAME + ' '
-        'password=' + PASSWORD + ' '
-    )
-    cursor = connection.cursor()
-
-def quit_database():
-    connection.commit()
-    cursor.close()
-    connection.close()
+        ] + events + lineups)
 
 def create_tables():
-    cursor.execute('DROP TABLE IF EXISTS Players')
-    cursor.execute('DROP TABLE IF EXISTS Names')
-    cursor.execute('DROP TABLE IF EXISTS Seasons')
-    cursor.execute('DROP TABLE IF EXISTS Teams')
+    ''' Create new empty tables. '''
     cursor.execute(
+        'DROP TABLE IF EXISTS Players; '
+        'DROP TABLE IF EXISTS Names; '
+        'DROP TABLE IF EXISTS Seasons; '
+        'DROP TABLE IF EXISTS Teams; '
         'CREATE TABLE Seasons ( '
         '    season_id SERIAL PRIMARY KEY, '
         '    competition_name VARCHAR(15), '
         '    season_name VARCHAR(10), '
         '    CONSTRAINT season_unique UNIQUE (competition_name, season_name) '
         '); '
-    )
-    cursor.execute(
         'CREATE TABLE Teams ( '
         '    team_id INT PRIMARY KEY, '
         '    team_name VARCHAR(64) '
         '); '
-    )
-    cursor.execute(
         'CREATE TABLE Names ('
         '    player_id INT PRIMARY KEY, '
         '    player_name VARCHAR(128) '
         '); '
-    )
-    cursor.execute(
         'CREATE TABLE Players ( '
         '    player_id INT, '
         '    season_id INT, '
@@ -163,68 +161,19 @@ def create_tables():
         '); '
     )
 
-def parse_l(path, season_id):
-    with open(path, 'r', encoding='utf-8') as file:
-        data = json.load(file)
-    for item in data:
-        team_id = item['team_id']
-        team_name = item['team_name']
-        cursor.execute(
-            'INSERT INTO Teams (team_id, team_name) '
-            'VALUES (%s, %s) '
-            'ON CONFLICT DO NOTHING; ',
-            (team_id, team_name)
-        )
-        for player in item['lineup']:
-            player_name = player['player_name']
-            player_id = player['player_id']
-            cursor.execute(
-                'INSERT INTO Names (player_id, player_name) '
-                'VALUES (%s, %s) '
-                'ON CONFLICT DO NOTHING; ',
-                (player_id, player_name)
-            )
-            cursor.execute(
-                'INSERT INTO Players (player_id, season_id, team_id) '
-                'VALUES (%s, %s, %s) '
-                'ON CONFLICT DO NOTHING; ',
-                (player_id, season_id, team_id)
-            )
-
-def parse_e(path, season_id):
-    with open(path, 'r', encoding='utf-8') as file:
-        data = json.load(file)
-    for item in data:
-        match item['type']['id']:
-            case 16: # shot
-                player_id = item['player']['id']
-                cursor.execute(
-                    'UPDATE Players '
-                    'SET shots = shots + 1 '
-                    'WHERE player_id = %s AND season_id = %s; ',
-                    (player_id, season_id)
-                )
-                if 'first_time' in item['shot']:
-                    cursor.execute(
-                        'UPDATE Players '
-                        'SET first_time_shots = first_time_shots + 1 '
-                        'WHERE player_id = %s AND season_id = %s; ',
-                        (player_id, season_id)
-                    )
-            case 30: # pass
-                player_id = item['player']['id']
-                cursor.execute(
-                    'UPDATE Players '
-                    'SET passes = passes + 1 '
-                    'WHERE player_id = %s AND season_id = %s; ',
-                    (player_id, season_id)
-                )
-
 @set_cwd
 def populate_tables():
+    ''' Fill new empty tables. '''
+    teams = []
+    players = []
+    names = []
+    shots = []
+    first_time_shots = []
+    passes = []
+
     with cd('json'):
-        m = glob.glob(os.path.join('data', 'matches', '**', '*.json'))
-        for path in m:
+        matches = glob.glob(os.path.join('data', 'matches', '**', '*.json'))
+        for path in matches:
             with open(path, 'r', encoding='utf-8') as file:
                 data = json.load(file)
             for item in data:
@@ -240,12 +189,74 @@ def populate_tables():
                     (competition_name, season_name)
                 )
                 season_id = cursor.fetchone()[0]
-                l = 'data/lineups/' + match_id + '.json'
-                e = 'data/events/' + match_id + '.json'
-                parse_l(l, season_id)
-                parse_e(e, season_id)
 
+                path = 'data/lineups/' + match_id + '.json'
+                with open(path, 'r', encoding='utf-8') as file:
+                    data = json.load(file)
+                for item in data:
+                    team_id = item['team_id']
+                    team_name = item['team_name']
+                    teams.append((team_id, team_name))
+                    for player in item['lineup']:
+                        player_name = player['player_name']
+                        player_id = player['player_id']
+                        players.append((player_id, season_id, team_id))
+                        names.append((player_id, player_name))
+
+                path = 'data/events/' + match_id + '.json'
+                with open(path, 'r', encoding='utf-8') as file:
+                    data = json.load(file)
+                for item in data:
+                    match item['type']['id']:
+                        case 16: # shot
+                            player_id = item['player']['id']
+                            shots.append((player_id, season_id))
+                            if 'first_time' in item['shot']:
+                                first_time_shots.append((player_id, season_id))
+                        case 30: # pass
+                            player_id = item['player']['id']
+                            passes.append((player_id, season_id))
+
+    cursor.executemany(
+        'INSERT INTO Teams (team_id, team_name) '
+        'VALUES (%s, %s) '
+        'ON CONFLICT DO NOTHING; ',
+        teams
+    )
+    cursor.executemany(
+        'INSERT INTO Names (player_id, player_name) '
+        'VALUES (%s, %s) '
+        'ON CONFLICT DO NOTHING; ',
+        names
+    )
+    cursor.executemany(
+        'INSERT INTO Players (player_id, season_id, team_id) '
+        'VALUES (%s, %s, %s) '
+        'ON CONFLICT DO NOTHING; ',
+        players
+    )
+    cursor.executemany(
+        'UPDATE Players '
+        'SET shots = shots + 1 '
+        'WHERE player_id = %s AND season_id = %s; ',
+        shots
+    )
+    cursor.executemany(
+        'UPDATE Players '
+        'SET first_time_shots = first_time_shots + 1 '
+        'WHERE player_id = %s AND season_id = %s; ',
+        first_time_shots
+    )
+    cursor.executemany(
+        'UPDATE Players '
+        'SET passes = passes + 1 '
+        'WHERE player_id = %s AND season_id = %s; ',
+        passes
+    )
+
+@set_cwd
 def to_csv(name):
+    ''' Get the previous query as CSV. '''
     cols = [description[0] for description in cursor.description]
     rows = cursor.fetchall()
     with open(name + '.csv', 'w', encoding='utf-8') as file:
