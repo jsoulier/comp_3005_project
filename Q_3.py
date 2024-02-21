@@ -2,7 +2,7 @@ import database
 
 database.to_csv(
     'Q_3',
-    'SELECT Players.player_id, Humans.human_name, COUNT(*) AS first_time_shots '
+    'SELECT Players.player_id, Humans.human_name, COUNT(*) AS first_times '
     'FROM Players '
     'JOIN Shots ON Players.player_id = Shots.player_id '
     'JOIN Seasons ON Players.season_id = Seasons.season_id '
@@ -11,6 +11,6 @@ database.to_csv(
     '    Shots.first_time = TRUE AND '
     '    Seasons.competition_name = %s AND Seasons.season_name IN (%s, %s, %s) '
     'GROUP BY Players.player_id, Humans.human_name '
-    'ORDER BY first_time_shots DESC; ',
+    'ORDER BY first_times DESC; ',
     ('La Liga', '2018/2019', '2019/2020', '2020/2021')
 )

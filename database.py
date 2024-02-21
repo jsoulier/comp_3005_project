@@ -284,6 +284,7 @@ def create_tables():
         '); '
         'CREATE TABLE Passes ( '
         '    player_id INT, '
+        '    through_ball BOOLEAN, '
         '    FOREIGN KEY (player_id) REFERENCES Players (player_id) '
         '); '
         'CREATE TABLE FiftyFifties ( '
@@ -467,7 +468,9 @@ def populate_tables():
                         case 28:
                             shields.append((human_id, team_id, season_id))
                         case 30:
-                            passes.append((human_id, team_id, season_id))
+                            pass_ = item['pass']
+                            through_ball = 'through_ball' in pass_
+                            passes.append((human_id, team_id, season_id, through_ball))
                         case 33:
                             fifty_fifties.append((human_id, team_id, season_id))
                         case 34:
@@ -709,12 +712,12 @@ def populate_tables():
         shields
     )
     cursor.executemany(
-        'INSERT INTO Passes (player_id) '
+        'INSERT INTO Passes (player_id, through_ball) '
         'VALUES (('
         '    SELECT player_id '
         '    FROM Players '
         '    WHERE human_id = %s AND team_id = %s AND season_id = %s '
-        '))',
+        '), %s)',
         passes
     )
     cursor.executemany(
