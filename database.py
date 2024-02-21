@@ -230,6 +230,7 @@ def create_tables():
         '); '
         'CREATE TABLE Shots ( '
         '    player_id INT, '
+        '    xg FLOAT, '
         '    FOREIGN KEY (player_id) REFERENCES Players (player_id) '
         '); '
         'CREATE TABLE Pressures ( '
@@ -436,7 +437,9 @@ def populate_tables():
                         case 14:
                             dribbles.append((human_id, team_id, season_id))
                         case 16:
-                            shots.append((human_id, team_id, season_id))
+                            shot = item['shot']
+                            xg = shot['statsbomb_xg']
+                            shots.append((human_id, team_id, season_id, xg))
                         case 17:
                             pressures.append((human_id, team_id, season_id))
                         case 18:
@@ -486,6 +489,7 @@ def populate_tables():
                         case 43:
                             carries.append((human_id, team_id, season_id))
 
+    # Fill tables
     cursor.executemany(
         'INSERT INTO Teams (team_id, team_name) '
         'VALUES (%s, %s) '
@@ -586,13 +590,13 @@ def populate_tables():
         dribbles
     )
     cursor.executemany(
-        'INSERT INTO Shots (player_id) '
+        'INSERT INTO Shots (player_id, xg) '
         'VALUES (('
         '    SELECT player_id '
         '    FROM Players '
         '    WHERE human_id = %s AND team_id = %s AND season_id = %s '
-        '))',
-        shots,
+        '), %s)',
+        shots
     )
     cursor.executemany(
         'INSERT INTO Pressures (player_id) '
@@ -739,15 +743,6 @@ def populate_tables():
         starting_xis
     )
     cursor.executemany(
-        'INSERT INTO Shots (player_id) '
-        'VALUES (('
-        '    SELECT player_id '
-        '    FROM Players '
-        '    WHERE human_id = %s AND team_id = %s AND season_id = %s '
-        '))',
-        shots
-    )
-    cursor.executemany(
         'INSERT INTO TacticalShifts (player_id) '
         'VALUES (('
         '    SELECT player_id '
@@ -800,6 +795,15 @@ def populate_tables():
         '    WHERE human_id = %s AND team_id = %s AND season_id = %s '
         '))',
         referee_ball_drops
+    )
+    cursor.executemany(
+        'INSERT INTO BallReceipts (player_id) '
+        'VALUES (('
+        '    SELECT player_id '
+        '    FROM Players '
+        '    WHERE human_id = %s AND team_id = %s AND season_id = %s '
+        '))',
+        ball_receipts
     )
     cursor.executemany(
         'INSERT INTO Carries (player_id) '
