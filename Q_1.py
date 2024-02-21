@@ -2,7 +2,7 @@ import database
 
 database.to_csv(
     'Q_1',
-    'SELECT Players.player_id, Humans.human_name, COALESCE(AVG(Shots.xg), 0) as xg '
+    'SELECT Players.human_id, Humans.human_name, COALESCE(AVG(Shots.xg), 0) as xg '
     'FROM Players '
     'LEFT JOIN Shots ON Players.player_id = Shots.player_id '
     'JOIN Seasons ON Players.season_id = Seasons.season_id '

@@ -226,6 +226,7 @@ def create_tables():
         '); '
         'CREATE TABLE Dribbles ( '
         '    player_id INT, '
+        '    completed BOOLEAN, '
         '    FOREIGN KEY (player_id) REFERENCES Players (player_id) '
         '); '
         'CREATE TABLE Shots ( '
@@ -437,7 +438,9 @@ def populate_tables():
                         case 10:
                             interceptions.append((human_id, team_id, season_id))
                         case 14:
-                            dribbles.append((human_id, team_id, season_id))
+                            dribble = item['dribble']
+                            completed = dribble['outcome']['id'] == 8
+                            dribbles.append((human_id, team_id, season_id, completed))
                         case 16:
                             shot = item['shot']
                             xg = shot['statsbomb_xg']
@@ -494,7 +497,7 @@ def populate_tables():
                         case 43:
                             carries.append((human_id, team_id, season_id))
 
-    # Fill tables
+    # Fill the tables
     cursor.executemany(
         'INSERT INTO Teams (team_id, team_name) '
         'VALUES (%s, %s) '
@@ -586,12 +589,12 @@ def populate_tables():
         interceptions
     )
     cursor.executemany(
-        'INSERT INTO Dribbles (player_id) '
+        'INSERT INTO Dribbles (player_id, completed) '
         'VALUES (('
         '    SELECT player_id '
         '    FROM Players '
         '    WHERE human_id = %s AND team_id = %s AND season_id = %s '
-        '))',
+        '), %s)',
         dribbles
     )
     cursor.executemany(
