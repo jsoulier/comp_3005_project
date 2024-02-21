@@ -2,12 +2,9 @@ import psycopg
 
 import contextlib
 import functools
-import glob
 import json
-import shutil
 import os
 import subprocess
-import stat
 
 UPSTREAM = 'https://github.com/statsbomb/open-data' 
 COMMIT = '0067cae166a56aa80b2ef18f61e16158d6a7359a'
@@ -22,6 +19,8 @@ SEASONS = [
     '2019/2020',
     '2020/2021',
 ]
+
+connection = ''
 
 @contextlib.contextmanager
 def cd(path):
@@ -40,14 +39,43 @@ def force_cwd(function):
         return function(*args, **kwargs)
     return _
 
-@force_cwd
 def open_database():
-    pass
+    global connection
+    connection = psycopg.connect(
+        'dbname=' + DATABASE + ' '
+        'user=' + USERNAME + ' '
+        'password=' + PASSWORD + ' '
+    )
+
+def create_database_tables():
+    with connection.cursor() as cursor:
+        cursor.execute('DROP TABLE IF EXISTS Seasons')
+        cursor.execute('DROP TABLE IF EXISTS Teams')
+        cursor.execute('DROP TABLE IF EXISTS Players')
+        cursor.execute(
+            'CREATE TABLE Seasons ('
+            '    id INT PRIMARY KEY,'
+            '    name VARCHAR(10)'
+            ');'
+        )
+        cursor.execute(
+            'CREATE TABLE Teams ('
+            '    id INT PRIMARY KEY'
+            ');'
+        )
+        cursor.execute(
+            'CREATE TABLE Players ('
+            '    season INT,'
+            '    team INT,'
+            '    FOREIGN KEY (season) REFERENCES Seasons(id),'
+            '    FOREIGN KEY (team) REFERENCES Teams(id)'
+            ');'
+        )
 
 @force_cwd
-def sparse_download():
-    if os.path.exists('json'):
-        return
+def populate_database():
+    # if os.path.exists('json'):
+    #     return
 
     # Start with basic metadata
     subprocess.run([
@@ -75,104 +103,44 @@ def sparse_download():
             COMMIT
         ])
 
+        events = []
+        lineups = []
+        matches = []
+
         # Clone the required matches
         path = os.path.join('data', 'competitions.json')
         with open(path, 'r', encoding='utf-8') as file:
             data = json.load(file)
-        paths = []
         for item in data:
             if item['season_name'] not in SEASONS:
                 continue
-            competition = str(item['competition_id'])
-            season = str(item['season_id'])
-            paths.append('data/matches/' + competition + '/' + season + '.json')
+            matches.append('data/matches/' + str(item['competition_id']) + '/' +
+                str(item['season_id']) + '.json')
         subprocess.run([
             'git',
             'sparse-checkout',
             'add',
             '--no-cone',
-        ] + paths)
+        ] + matches)
+
+        # Clone the required events and lineups
+        for path in matches:
+            path = os.path.normpath(path)
+            with open(path, 'r', encoding='utf-8') as file:
+                data = json.load(file)
+            for item in data:
+                events.append('data/events/' + str(item['match_id']) + '.json')
+                lineups.append('data/lineups/' + str(item['match_id']) + '.json')
+        subprocess.run([
+            'git',
+            'sparse-checkout',
+            'add',
+            '--no-cone',
+        ] + events + lineups)
+
+        # TODO: populate events and lineups
 
 if __name__ == '__main__':
     open_database()
-    sparse_download()
-
-
-
-
-
-
-
-
-# class DB:
-#     OD_NAME_       = 'football'
-#     OD_REPOSITORY_ = 'https://github.com/statsbomb/open-data'
-#     OD_COMMIT_     = '0067cae166a56aa80b2ef18f61e16158d6a7359a'
-#     DB_NAME_       = 'comp_3005_project'
-#     DB_USERNAME_   = 'postgres'
-#     DB_PASSWORD_   = 'password'
-
-#     def __init__(self):
-#         try:
-#             self.open_()
-#         except Exception as e:
-#             print(e)
-
-#     def load(self):
-#         try:
-#             self.download_()
-#             # self.load_('', lambda x: '')
-#         except Exception as e:
-#             print(e)
-
-#     @contextlib.contextmanager
-#     def cd_(self, path):
-#         previous = os.getcwd()
-#         os.chdir(path)
-#         try:
-#             yield
-#         finally:
-#             os.chdir(previous)
-
-#     def open_(self):
-#         self.connection = psycopg.connect(
-#             'dbname={name} '
-#             'user={username} '
-#             'password={password} '
-#             .format(
-#                 name=self.DB_NAME_,
-#                 username=self.DB_USERNAME_,
-#                 password=self.DB_PASSWORD_
-#             )
-#         )
-
-#     def download_(self):
-#         if os.path.exists(self.OD_NAME_):
-#             return
-#         subprocess.run([
-#             'git',
-#             'clone',
-#             '--single-branch',
-#             self.OD_REPOSITORY_,
-#             self.OD_NAME_
-#         ])
-#         with self.cd_(self.OD_NAME_):
-#             subprocess.run([
-#                 'git',
-#                 'reset',
-#                 '--hard',
-#                 self.OD_COMMIT_
-#             ])
-
-#     def load_(self, name, function):
-#         search = os.path.join(self.OD_NAME_, 'data', name, '**', '*.json')
-#         for path in glob.glob(search, recursive=True):
-#             try:
-#                 with open(path, 'r', encoding='utf-8') as file:
-#                     function(json.load(file))
-#             except Exception as e:
-#                 print(e)
-
-# if __name__ == '__main__':
-#     db = DB()
-#     db.load()
+    create_database_tables()
+    populate_database()
