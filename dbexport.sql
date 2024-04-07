@@ -5,7 +5,7 @@
 -- Dumped from database version 16.1
 -- Dumped by pg_dump version 16.1
 
--- Started on 2024-04-07 16:58:00
+-- Started on 2024-04-07 18:57:00
 
 SET statement_timeout = 0;
 SET lock_timeout = 0;
@@ -23,7 +23,7 @@ SET default_tablespace = '';
 SET default_table_access_method = heap;
 
 --
--- TOC entry 238 (class 1259 OID 55588)
+-- TOC entry 238 (class 1259 OID 67836)
 -- Name: bad_behaviour; Type: TABLE; Schema: public; Owner: postgres
 --
 
@@ -35,7 +35,7 @@ CREATE TABLE public.bad_behaviour (
 ALTER TABLE public.bad_behaviour OWNER TO postgres;
 
 --
--- TOC entry 253 (class 1259 OID 55708)
+-- TOC entry 253 (class 1259 OID 67956)
 -- Name: ball_receipt; Type: TABLE; Schema: public; Owner: postgres
 --
 
@@ -47,7 +47,7 @@ CREATE TABLE public.ball_receipt (
 ALTER TABLE public.ball_receipt OWNER TO postgres;
 
 --
--- TOC entry 221 (class 1259 OID 55452)
+-- TOC entry 221 (class 1259 OID 67700)
 -- Name: ball_recovery; Type: TABLE; Schema: public; Owner: postgres
 --
 
@@ -59,7 +59,7 @@ CREATE TABLE public.ball_recovery (
 ALTER TABLE public.ball_recovery OWNER TO postgres;
 
 --
--- TOC entry 225 (class 1259 OID 55484)
+-- TOC entry 225 (class 1259 OID 67732)
 -- Name: block; Type: TABLE; Schema: public; Owner: postgres
 --
 
@@ -71,7 +71,7 @@ CREATE TABLE public.block (
 ALTER TABLE public.block OWNER TO postgres;
 
 --
--- TOC entry 224 (class 1259 OID 55476)
+-- TOC entry 224 (class 1259 OID 67724)
 -- Name: camera_on; Type: TABLE; Schema: public; Owner: postgres
 --
 
@@ -83,7 +83,7 @@ CREATE TABLE public.camera_on (
 ALTER TABLE public.camera_on OWNER TO postgres;
 
 --
--- TOC entry 254 (class 1259 OID 55716)
+-- TOC entry 254 (class 1259 OID 67964)
 -- Name: carry; Type: TABLE; Schema: public; Owner: postgres
 --
 
@@ -95,7 +95,7 @@ CREATE TABLE public.carry (
 ALTER TABLE public.carry OWNER TO postgres;
 
 --
--- TOC entry 227 (class 1259 OID 55500)
+-- TOC entry 227 (class 1259 OID 67748)
 -- Name: clearance; Type: TABLE; Schema: public; Owner: postgres
 --
 
@@ -107,7 +107,7 @@ CREATE TABLE public.clearance (
 ALTER TABLE public.clearance OWNER TO postgres;
 
 --
--- TOC entry 222 (class 1259 OID 55460)
+-- TOC entry 222 (class 1259 OID 67708)
 -- Name: dispossessed; Type: TABLE; Schema: public; Owner: postgres
 --
 
@@ -119,7 +119,7 @@ CREATE TABLE public.dispossessed (
 ALTER TABLE public.dispossessed OWNER TO postgres;
 
 --
--- TOC entry 229 (class 1259 OID 55516)
+-- TOC entry 229 (class 1259 OID 67764)
 -- Name: dribble; Type: TABLE; Schema: public; Owner: postgres
 --
 
@@ -132,7 +132,7 @@ CREATE TABLE public.dribble (
 ALTER TABLE public.dribble OWNER TO postgres;
 
 --
--- TOC entry 250 (class 1259 OID 55684)
+-- TOC entry 250 (class 1259 OID 67932)
 -- Name: dribbled_past; Type: TABLE; Schema: public; Owner: postgres
 --
 
@@ -144,7 +144,7 @@ CREATE TABLE public.dribbled_past (
 ALTER TABLE public.dribbled_past OWNER TO postgres;
 
 --
--- TOC entry 223 (class 1259 OID 55468)
+-- TOC entry 223 (class 1259 OID 67716)
 -- Name: duel; Type: TABLE; Schema: public; Owner: postgres
 --
 
@@ -156,7 +156,7 @@ CREATE TABLE public.duel (
 ALTER TABLE public.duel OWNER TO postgres;
 
 --
--- TOC entry 248 (class 1259 OID 55668)
+-- TOC entry 248 (class 1259 OID 67916)
 -- Name: error; Type: TABLE; Schema: public; Owner: postgres
 --
 
@@ -168,7 +168,7 @@ CREATE TABLE public.error (
 ALTER TABLE public.error OWNER TO postgres;
 
 --
--- TOC entry 244 (class 1259 OID 55636)
+-- TOC entry 244 (class 1259 OID 67884)
 -- Name: fifty_fifty; Type: TABLE; Schema: public; Owner: postgres
 --
 
@@ -180,7 +180,7 @@ CREATE TABLE public.fifty_fifty (
 ALTER TABLE public.fifty_fifty OWNER TO postgres;
 
 --
--- TOC entry 236 (class 1259 OID 55572)
+-- TOC entry 236 (class 1259 OID 67820)
 -- Name: foul_committed; Type: TABLE; Schema: public; Owner: postgres
 --
 
@@ -192,7 +192,7 @@ CREATE TABLE public.foul_committed (
 ALTER TABLE public.foul_committed OWNER TO postgres;
 
 --
--- TOC entry 235 (class 1259 OID 55564)
+-- TOC entry 235 (class 1259 OID 67812)
 -- Name: foul_won; Type: TABLE; Schema: public; Owner: postgres
 --
 
@@ -204,7 +204,7 @@ CREATE TABLE public.foul_won (
 ALTER TABLE public.foul_won OWNER TO postgres;
 
 --
--- TOC entry 237 (class 1259 OID 55580)
+-- TOC entry 237 (class 1259 OID 67828)
 -- Name: goal_keeper; Type: TABLE; Schema: public; Owner: postgres
 --
 
@@ -216,7 +216,7 @@ CREATE TABLE public.goal_keeper (
 ALTER TABLE public.goal_keeper OWNER TO postgres;
 
 --
--- TOC entry 245 (class 1259 OID 55644)
+-- TOC entry 245 (class 1259 OID 67892)
 -- Name: half_end; Type: TABLE; Schema: public; Owner: postgres
 --
 
@@ -228,7 +228,7 @@ CREATE TABLE public.half_end (
 ALTER TABLE public.half_end OWNER TO postgres;
 
 --
--- TOC entry 232 (class 1259 OID 55540)
+-- TOC entry 232 (class 1259 OID 67788)
 -- Name: half_start; Type: TABLE; Schema: public; Owner: postgres
 --
 
@@ -240,7 +240,7 @@ CREATE TABLE public.half_start (
 ALTER TABLE public.half_start OWNER TO postgres;
 
 --
--- TOC entry 251 (class 1259 OID 55692)
+-- TOC entry 251 (class 1259 OID 67940)
 -- Name: injury_stoppage; Type: TABLE; Schema: public; Owner: postgres
 --
 
@@ -252,7 +252,7 @@ CREATE TABLE public.injury_stoppage (
 ALTER TABLE public.injury_stoppage OWNER TO postgres;
 
 --
--- TOC entry 228 (class 1259 OID 55508)
+-- TOC entry 228 (class 1259 OID 67756)
 -- Name: interception; Type: TABLE; Schema: public; Owner: postgres
 --
 
@@ -264,7 +264,7 @@ CREATE TABLE public.interception (
 ALTER TABLE public.interception OWNER TO postgres;
 
 --
--- TOC entry 249 (class 1259 OID 55676)
+-- TOC entry 249 (class 1259 OID 67924)
 -- Name: miscontrol; Type: TABLE; Schema: public; Owner: postgres
 --
 
@@ -276,7 +276,7 @@ CREATE TABLE public.miscontrol (
 ALTER TABLE public.miscontrol OWNER TO postgres;
 
 --
--- TOC entry 226 (class 1259 OID 55492)
+-- TOC entry 226 (class 1259 OID 67740)
 -- Name: offside; Type: TABLE; Schema: public; Owner: postgres
 --
 
@@ -288,7 +288,7 @@ CREATE TABLE public.offside (
 ALTER TABLE public.offside OWNER TO postgres;
 
 --
--- TOC entry 234 (class 1259 OID 55556)
+-- TOC entry 234 (class 1259 OID 67804)
 -- Name: own_goal_against; Type: TABLE; Schema: public; Owner: postgres
 --
 
@@ -300,7 +300,7 @@ CREATE TABLE public.own_goal_against (
 ALTER TABLE public.own_goal_against OWNER TO postgres;
 
 --
--- TOC entry 239 (class 1259 OID 55596)
+-- TOC entry 239 (class 1259 OID 67844)
 -- Name: own_goal_for; Type: TABLE; Schema: public; Owner: postgres
 --
 
@@ -312,7 +312,7 @@ CREATE TABLE public.own_goal_for (
 ALTER TABLE public.own_goal_for OWNER TO postgres;
 
 --
--- TOC entry 243 (class 1259 OID 55628)
+-- TOC entry 243 (class 1259 OID 67876)
 -- Name: pass; Type: TABLE; Schema: public; Owner: postgres
 --
 
@@ -325,7 +325,7 @@ CREATE TABLE public.pass (
 ALTER TABLE public.pass OWNER TO postgres;
 
 --
--- TOC entry 217 (class 1259 OID 55418)
+-- TOC entry 217 (class 1259 OID 67666)
 -- Name: person; Type: TABLE; Schema: public; Owner: postgres
 --
 
@@ -338,7 +338,7 @@ CREATE TABLE public.person (
 ALTER TABLE public.person OWNER TO postgres;
 
 --
--- TOC entry 220 (class 1259 OID 55429)
+-- TOC entry 220 (class 1259 OID 67677)
 -- Name: player; Type: TABLE; Schema: public; Owner: postgres
 --
 
@@ -353,7 +353,7 @@ CREATE TABLE public.player (
 ALTER TABLE public.player OWNER TO postgres;
 
 --
--- TOC entry 241 (class 1259 OID 55612)
+-- TOC entry 241 (class 1259 OID 67860)
 -- Name: player_off; Type: TABLE; Schema: public; Owner: postgres
 --
 
@@ -365,7 +365,7 @@ CREATE TABLE public.player_off (
 ALTER TABLE public.player_off OWNER TO postgres;
 
 --
--- TOC entry 240 (class 1259 OID 55604)
+-- TOC entry 240 (class 1259 OID 67852)
 -- Name: player_on; Type: TABLE; Schema: public; Owner: postgres
 --
 
@@ -377,7 +377,7 @@ CREATE TABLE public.player_on (
 ALTER TABLE public.player_on OWNER TO postgres;
 
 --
--- TOC entry 219 (class 1259 OID 55428)
+-- TOC entry 219 (class 1259 OID 67676)
 -- Name: player_player_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
 --
 
@@ -402,7 +402,7 @@ ALTER SEQUENCE public.player_player_id_seq OWNED BY public.player.player_id;
 
 
 --
--- TOC entry 231 (class 1259 OID 55532)
+-- TOC entry 231 (class 1259 OID 67780)
 -- Name: pressure; Type: TABLE; Schema: public; Owner: postgres
 --
 
@@ -414,7 +414,7 @@ CREATE TABLE public.pressure (
 ALTER TABLE public.pressure OWNER TO postgres;
 
 --
--- TOC entry 252 (class 1259 OID 55700)
+-- TOC entry 252 (class 1259 OID 67948)
 -- Name: referee_ball_drop; Type: TABLE; Schema: public; Owner: postgres
 --
 
@@ -426,7 +426,7 @@ CREATE TABLE public.referee_ball_drop (
 ALTER TABLE public.referee_ball_drop OWNER TO postgres;
 
 --
--- TOC entry 216 (class 1259 OID 55410)
+-- TOC entry 216 (class 1259 OID 67658)
 -- Name: season; Type: TABLE; Schema: public; Owner: postgres
 --
 
@@ -440,7 +440,7 @@ CREATE TABLE public.season (
 ALTER TABLE public.season OWNER TO postgres;
 
 --
--- TOC entry 215 (class 1259 OID 55409)
+-- TOC entry 215 (class 1259 OID 67657)
 -- Name: season_season_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
 --
 
@@ -465,7 +465,7 @@ ALTER SEQUENCE public.season_season_id_seq OWNED BY public.season.season_id;
 
 
 --
--- TOC entry 242 (class 1259 OID 55620)
+-- TOC entry 242 (class 1259 OID 67868)
 -- Name: shield; Type: TABLE; Schema: public; Owner: postgres
 --
 
@@ -477,7 +477,7 @@ CREATE TABLE public.shield (
 ALTER TABLE public.shield OWNER TO postgres;
 
 --
--- TOC entry 230 (class 1259 OID 55524)
+-- TOC entry 230 (class 1259 OID 67772)
 -- Name: shot; Type: TABLE; Schema: public; Owner: postgres
 --
 
@@ -491,7 +491,7 @@ CREATE TABLE public.shot (
 ALTER TABLE public.shot OWNER TO postgres;
 
 --
--- TOC entry 246 (class 1259 OID 55652)
+-- TOC entry 246 (class 1259 OID 67900)
 -- Name: starting_xi; Type: TABLE; Schema: public; Owner: postgres
 --
 
@@ -503,7 +503,7 @@ CREATE TABLE public.starting_xi (
 ALTER TABLE public.starting_xi OWNER TO postgres;
 
 --
--- TOC entry 233 (class 1259 OID 55548)
+-- TOC entry 233 (class 1259 OID 67796)
 -- Name: substitution; Type: TABLE; Schema: public; Owner: postgres
 --
 
@@ -515,7 +515,7 @@ CREATE TABLE public.substitution (
 ALTER TABLE public.substitution OWNER TO postgres;
 
 --
--- TOC entry 247 (class 1259 OID 55660)
+-- TOC entry 247 (class 1259 OID 67908)
 -- Name: tactical_shift; Type: TABLE; Schema: public; Owner: postgres
 --
 
@@ -527,7 +527,7 @@ CREATE TABLE public.tactical_shift (
 ALTER TABLE public.tactical_shift OWNER TO postgres;
 
 --
--- TOC entry 218 (class 1259 OID 55423)
+-- TOC entry 218 (class 1259 OID 67671)
 -- Name: team; Type: TABLE; Schema: public; Owner: postgres
 --
 
@@ -540,7 +540,7 @@ CREATE TABLE public.team (
 ALTER TABLE public.team OWNER TO postgres;
 
 --
--- TOC entry 4838 (class 2604 OID 55432)
+-- TOC entry 4838 (class 2604 OID 67680)
 -- Name: player player_id; Type: DEFAULT; Schema: public; Owner: postgres
 --
 
@@ -548,7 +548,7 @@ ALTER TABLE ONLY public.player ALTER COLUMN player_id SET DEFAULT nextval('publi
 
 
 --
--- TOC entry 4837 (class 2604 OID 55413)
+-- TOC entry 4837 (class 2604 OID 67661)
 -- Name: season season_id; Type: DEFAULT; Schema: public; Owner: postgres
 --
 
@@ -556,7 +556,7 @@ ALTER TABLE ONLY public.season ALTER COLUMN season_id SET DEFAULT nextval('publi
 
 
 --
--- TOC entry 5054 (class 0 OID 55588)
+-- TOC entry 5054 (class 0 OID 67836)
 -- Dependencies: 238
 -- Data for Name: bad_behaviour; Type: TABLE DATA; Schema: public; Owner: postgres
 --
@@ -690,7 +690,7 @@ COPY public.bad_behaviour (player_id) FROM stdin;
 
 
 --
--- TOC entry 5069 (class 0 OID 55708)
+-- TOC entry 5069 (class 0 OID 67956)
 -- Dependencies: 253
 -- Data for Name: ball_receipt; Type: TABLE DATA; Schema: public; Owner: postgres
 --
@@ -143388,7 +143388,7 @@ COPY public.ball_receipt (player_id) FROM stdin;
 
 
 --
--- TOC entry 5037 (class 0 OID 55452)
+-- TOC entry 5037 (class 0 OID 67700)
 -- Dependencies: 221
 -- Data for Name: ball_recovery; Type: TABLE DATA; Schema: public; Owner: postgres
 --
@@ -156556,7 +156556,7 @@ COPY public.ball_recovery (player_id) FROM stdin;
 
 
 --
--- TOC entry 5041 (class 0 OID 55484)
+-- TOC entry 5041 (class 0 OID 67732)
 -- Dependencies: 225
 -- Data for Name: block; Type: TABLE DATA; Schema: public; Owner: postgres
 --
@@ -161628,7 +161628,7 @@ COPY public.block (player_id) FROM stdin;
 
 
 --
--- TOC entry 5040 (class 0 OID 55476)
+-- TOC entry 5040 (class 0 OID 67724)
 -- Dependencies: 224
 -- Data for Name: camera_on; Type: TABLE DATA; Schema: public; Owner: postgres
 --
@@ -161638,7 +161638,7 @@ COPY public.camera_on (player_id) FROM stdin;
 
 
 --
--- TOC entry 5070 (class 0 OID 55716)
+-- TOC entry 5070 (class 0 OID 67964)
 -- Dependencies: 254
 -- Data for Name: carry; Type: TABLE DATA; Schema: public; Owner: postgres
 --
@@ -283224,7 +283224,7 @@ COPY public.carry (player_id) FROM stdin;
 
 
 --
--- TOC entry 5043 (class 0 OID 55500)
+-- TOC entry 5043 (class 0 OID 67748)
 -- Dependencies: 227
 -- Data for Name: clearance; Type: TABLE DATA; Schema: public; Owner: postgres
 --
@@ -288545,7 +288545,7 @@ COPY public.clearance (player_id) FROM stdin;
 
 
 --
--- TOC entry 5038 (class 0 OID 55460)
+-- TOC entry 5038 (class 0 OID 67708)
 -- Dependencies: 222
 -- Data for Name: dispossessed; Type: TABLE DATA; Schema: public; Owner: postgres
 --
@@ -291860,7 +291860,7 @@ COPY public.dispossessed (player_id) FROM stdin;
 
 
 --
--- TOC entry 5045 (class 0 OID 55516)
+-- TOC entry 5045 (class 0 OID 67764)
 -- Dependencies: 229
 -- Data for Name: dribble; Type: TABLE DATA; Schema: public; Owner: postgres
 --
@@ -296940,7 +296940,7 @@ COPY public.dribble (player_id, completed) FROM stdin;
 
 
 --
--- TOC entry 5066 (class 0 OID 55684)
+-- TOC entry 5066 (class 0 OID 67932)
 -- Dependencies: 250
 -- Data for Name: dribbled_past; Type: TABLE DATA; Schema: public; Owner: postgres
 --
@@ -300249,7 +300249,7 @@ COPY public.dribbled_past (player_id) FROM stdin;
 
 
 --
--- TOC entry 5039 (class 0 OID 55468)
+-- TOC entry 5039 (class 0 OID 67716)
 -- Dependencies: 223
 -- Data for Name: duel; Type: TABLE DATA; Schema: public; Owner: postgres
 --
@@ -308911,7 +308911,7 @@ COPY public.duel (player_id) FROM stdin;
 
 
 --
--- TOC entry 5064 (class 0 OID 55668)
+-- TOC entry 5064 (class 0 OID 67916)
 -- Dependencies: 248
 -- Data for Name: error; Type: TABLE DATA; Schema: public; Owner: postgres
 --
@@ -308987,7 +308987,7 @@ COPY public.error (player_id) FROM stdin;
 
 
 --
--- TOC entry 5060 (class 0 OID 55636)
+-- TOC entry 5060 (class 0 OID 67884)
 -- Dependencies: 244
 -- Data for Name: fifty_fifty; Type: TABLE DATA; Schema: public; Owner: postgres
 --
@@ -309201,7 +309201,7 @@ COPY public.fifty_fifty (player_id) FROM stdin;
 
 
 --
--- TOC entry 5052 (class 0 OID 55572)
+-- TOC entry 5052 (class 0 OID 67820)
 -- Dependencies: 236
 -- Data for Name: foul_committed; Type: TABLE DATA; Schema: public; Owner: postgres
 --
@@ -313442,7 +313442,7 @@ COPY public.foul_committed (player_id) FROM stdin;
 
 
 --
--- TOC entry 5051 (class 0 OID 55564)
+-- TOC entry 5051 (class 0 OID 67812)
 -- Dependencies: 235
 -- Data for Name: foul_won; Type: TABLE DATA; Schema: public; Owner: postgres
 --
@@ -317477,7 +317477,7 @@ COPY public.foul_won (player_id) FROM stdin;
 
 
 --
--- TOC entry 5053 (class 0 OID 55580)
+-- TOC entry 5053 (class 0 OID 67828)
 -- Dependencies: 237
 -- Data for Name: goal_keeper; Type: TABLE DATA; Schema: public; Owner: postgres
 --
@@ -321577,7 +321577,7 @@ COPY public.goal_keeper (player_id) FROM stdin;
 
 
 --
--- TOC entry 5061 (class 0 OID 55644)
+-- TOC entry 5061 (class 0 OID 67892)
 -- Dependencies: 245
 -- Data for Name: half_end; Type: TABLE DATA; Schema: public; Owner: postgres
 --
@@ -322147,7 +322147,7 @@ COPY public.half_end (player_id) FROM stdin;
 
 
 --
--- TOC entry 5048 (class 0 OID 55540)
+-- TOC entry 5048 (class 0 OID 67788)
 -- Dependencies: 232
 -- Data for Name: half_start; Type: TABLE DATA; Schema: public; Owner: postgres
 --
@@ -322717,7 +322717,7 @@ COPY public.half_start (player_id) FROM stdin;
 
 
 --
--- TOC entry 5067 (class 0 OID 55692)
+-- TOC entry 5067 (class 0 OID 67940)
 -- Dependencies: 251
 -- Data for Name: injury_stoppage; Type: TABLE DATA; Schema: public; Owner: postgres
 --
@@ -323070,7 +323070,7 @@ COPY public.injury_stoppage (player_id) FROM stdin;
 
 
 --
--- TOC entry 5044 (class 0 OID 55508)
+-- TOC entry 5044 (class 0 OID 67756)
 -- Dependencies: 228
 -- Data for Name: interception; Type: TABLE DATA; Schema: public; Owner: postgres
 --
@@ -325819,7 +325819,7 @@ COPY public.interception (player_id) FROM stdin;
 
 
 --
--- TOC entry 5065 (class 0 OID 55676)
+-- TOC entry 5065 (class 0 OID 67924)
 -- Dependencies: 249
 -- Data for Name: miscontrol; Type: TABLE DATA; Schema: public; Owner: postgres
 --
@@ -329163,7 +329163,7 @@ COPY public.miscontrol (player_id) FROM stdin;
 
 
 --
--- TOC entry 5042 (class 0 OID 55492)
+-- TOC entry 5042 (class 0 OID 67740)
 -- Dependencies: 226
 -- Data for Name: offside; Type: TABLE DATA; Schema: public; Owner: postgres
 --
@@ -329214,7 +329214,7 @@ COPY public.offside (player_id) FROM stdin;
 
 
 --
--- TOC entry 5050 (class 0 OID 55556)
+-- TOC entry 5050 (class 0 OID 67804)
 -- Dependencies: 234
 -- Data for Name: own_goal_against; Type: TABLE DATA; Schema: public; Owner: postgres
 --
@@ -329241,7 +329241,7 @@ COPY public.own_goal_against (player_id) FROM stdin;
 
 
 --
--- TOC entry 5055 (class 0 OID 55596)
+-- TOC entry 5055 (class 0 OID 67844)
 -- Dependencies: 239
 -- Data for Name: own_goal_for; Type: TABLE DATA; Schema: public; Owner: postgres
 --
@@ -329268,7 +329268,7 @@ COPY public.own_goal_for (player_id) FROM stdin;
 
 
 --
--- TOC entry 5059 (class 0 OID 55628)
+-- TOC entry 5059 (class 0 OID 67876)
 -- Dependencies: 243
 -- Data for Name: pass; Type: TABLE DATA; Schema: public; Owner: postgres
 --
@@ -480293,7 +480293,7 @@ COPY public.pass (player_id, through_ball) FROM stdin;
 
 
 --
--- TOC entry 5033 (class 0 OID 55418)
+-- TOC entry 5033 (class 0 OID 67666)
 -- Dependencies: 217
 -- Data for Name: person; Type: TABLE DATA; Schema: public; Owner: postgres
 --
@@ -481531,7 +481531,7 @@ COPY public.person (person_id, person_name) FROM stdin;
 
 
 --
--- TOC entry 5036 (class 0 OID 55429)
+-- TOC entry 5036 (class 0 OID 67677)
 -- Dependencies: 220
 -- Data for Name: player; Type: TABLE DATA; Schema: public; Owner: postgres
 --
@@ -483396,7 +483396,7 @@ COPY public.player (player_id, person_id, team_id, season_id) FROM stdin;
 
 
 --
--- TOC entry 5057 (class 0 OID 55612)
+-- TOC entry 5057 (class 0 OID 67860)
 -- Dependencies: 241
 -- Data for Name: player_off; Type: TABLE DATA; Schema: public; Owner: postgres
 --
@@ -483475,7 +483475,7 @@ COPY public.player_off (player_id) FROM stdin;
 
 
 --
--- TOC entry 5056 (class 0 OID 55604)
+-- TOC entry 5056 (class 0 OID 67852)
 -- Dependencies: 240
 -- Data for Name: player_on; Type: TABLE DATA; Schema: public; Owner: postgres
 --
@@ -483554,7 +483554,7 @@ COPY public.player_on (player_id) FROM stdin;
 
 
 --
--- TOC entry 5047 (class 0 OID 55532)
+-- TOC entry 5047 (class 0 OID 67780)
 -- Dependencies: 231
 -- Data for Name: pressure; Type: TABLE DATA; Schema: public; Owner: postgres
 --
@@ -528014,7 +528014,7 @@ COPY public.pressure (player_id) FROM stdin;
 
 
 --
--- TOC entry 5068 (class 0 OID 55700)
+-- TOC entry 5068 (class 0 OID 67948)
 -- Dependencies: 252
 -- Data for Name: referee_ball_drop; Type: TABLE DATA; Schema: public; Owner: postgres
 --
@@ -528133,7 +528133,7 @@ COPY public.referee_ball_drop (player_id) FROM stdin;
 
 
 --
--- TOC entry 5032 (class 0 OID 55410)
+-- TOC entry 5032 (class 0 OID 67658)
 -- Dependencies: 216
 -- Data for Name: season; Type: TABLE DATA; Schema: public; Owner: postgres
 --
@@ -528147,7 +528147,7 @@ COPY public.season (season_id, competition_name, season_name) FROM stdin;
 
 
 --
--- TOC entry 5058 (class 0 OID 55620)
+-- TOC entry 5058 (class 0 OID 67868)
 -- Dependencies: 242
 -- Data for Name: shield; Type: TABLE DATA; Schema: public; Owner: postgres
 --
@@ -528285,7 +528285,7 @@ COPY public.shield (player_id) FROM stdin;
 
 
 --
--- TOC entry 5046 (class 0 OID 55524)
+-- TOC entry 5046 (class 0 OID 67772)
 -- Dependencies: 230
 -- Data for Name: shot; Type: TABLE DATA; Schema: public; Owner: postgres
 --
@@ -531702,7 +531702,7 @@ COPY public.shot (player_id, xg, first_time) FROM stdin;
 
 
 --
--- TOC entry 5062 (class 0 OID 55652)
+-- TOC entry 5062 (class 0 OID 67900)
 -- Dependencies: 246
 -- Data for Name: starting_xi; Type: TABLE DATA; Schema: public; Owner: postgres
 --
@@ -531992,7 +531992,7 @@ COPY public.starting_xi (player_id) FROM stdin;
 
 
 --
--- TOC entry 5049 (class 0 OID 55548)
+-- TOC entry 5049 (class 0 OID 67796)
 -- Dependencies: 233
 -- Data for Name: substitution; Type: TABLE DATA; Schema: public; Owner: postgres
 --
@@ -532905,7 +532905,7 @@ COPY public.substitution (player_id) FROM stdin;
 
 
 --
--- TOC entry 5063 (class 0 OID 55660)
+-- TOC entry 5063 (class 0 OID 67908)
 -- Dependencies: 247
 -- Data for Name: tactical_shift; Type: TABLE DATA; Schema: public; Owner: postgres
 --
@@ -533204,7 +533204,7 @@ COPY public.tactical_shift (player_id) FROM stdin;
 
 
 --
--- TOC entry 5034 (class 0 OID 55423)
+-- TOC entry 5034 (class 0 OID 67671)
 -- Dependencies: 218
 -- Data for Name: team; Type: TABLE DATA; Schema: public; Owner: postgres
 --
@@ -533277,7 +533277,7 @@ SELECT pg_catalog.setval('public.season_season_id_seq', 140, true);
 
 
 --
--- TOC entry 4844 (class 2606 OID 55422)
+-- TOC entry 4844 (class 2606 OID 67670)
 -- Name: person person_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -533286,7 +533286,7 @@ ALTER TABLE ONLY public.person
 
 
 --
--- TOC entry 4848 (class 2606 OID 55434)
+-- TOC entry 4848 (class 2606 OID 67682)
 -- Name: player player_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -533295,7 +533295,7 @@ ALTER TABLE ONLY public.player
 
 
 --
--- TOC entry 4850 (class 2606 OID 55436)
+-- TOC entry 4850 (class 2606 OID 67684)
 -- Name: player player_unique; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -533304,7 +533304,7 @@ ALTER TABLE ONLY public.player
 
 
 --
--- TOC entry 4840 (class 2606 OID 55415)
+-- TOC entry 4840 (class 2606 OID 67663)
 -- Name: season season_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -533313,7 +533313,7 @@ ALTER TABLE ONLY public.season
 
 
 --
--- TOC entry 4842 (class 2606 OID 55417)
+-- TOC entry 4842 (class 2606 OID 67665)
 -- Name: season season_unique; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -533322,7 +533322,7 @@ ALTER TABLE ONLY public.season
 
 
 --
--- TOC entry 4846 (class 2606 OID 55427)
+-- TOC entry 4846 (class 2606 OID 67675)
 -- Name: team team_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -533331,7 +533331,7 @@ ALTER TABLE ONLY public.team
 
 
 --
--- TOC entry 4871 (class 2606 OID 55591)
+-- TOC entry 4871 (class 2606 OID 67839)
 -- Name: bad_behaviour bad_behaviour_player_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -533340,7 +533340,7 @@ ALTER TABLE ONLY public.bad_behaviour
 
 
 --
--- TOC entry 4886 (class 2606 OID 55711)
+-- TOC entry 4886 (class 2606 OID 67959)
 -- Name: ball_receipt ball_receipt_player_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -533349,7 +533349,7 @@ ALTER TABLE ONLY public.ball_receipt
 
 
 --
--- TOC entry 4854 (class 2606 OID 55455)
+-- TOC entry 4854 (class 2606 OID 67703)
 -- Name: ball_recovery ball_recovery_player_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -533358,7 +533358,7 @@ ALTER TABLE ONLY public.ball_recovery
 
 
 --
--- TOC entry 4858 (class 2606 OID 55487)
+-- TOC entry 4858 (class 2606 OID 67735)
 -- Name: block block_player_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -533367,7 +533367,7 @@ ALTER TABLE ONLY public.block
 
 
 --
--- TOC entry 4857 (class 2606 OID 55479)
+-- TOC entry 4857 (class 2606 OID 67727)
 -- Name: camera_on camera_on_player_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -533376,7 +533376,7 @@ ALTER TABLE ONLY public.camera_on
 
 
 --
--- TOC entry 4887 (class 2606 OID 55719)
+-- TOC entry 4887 (class 2606 OID 67967)
 -- Name: carry carry_player_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -533385,7 +533385,7 @@ ALTER TABLE ONLY public.carry
 
 
 --
--- TOC entry 4860 (class 2606 OID 55503)
+-- TOC entry 4860 (class 2606 OID 67751)
 -- Name: clearance clearance_player_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -533394,7 +533394,7 @@ ALTER TABLE ONLY public.clearance
 
 
 --
--- TOC entry 4855 (class 2606 OID 55463)
+-- TOC entry 4855 (class 2606 OID 67711)
 -- Name: dispossessed dispossessed_player_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -533403,7 +533403,7 @@ ALTER TABLE ONLY public.dispossessed
 
 
 --
--- TOC entry 4862 (class 2606 OID 55519)
+-- TOC entry 4862 (class 2606 OID 67767)
 -- Name: dribble dribble_player_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -533412,7 +533412,7 @@ ALTER TABLE ONLY public.dribble
 
 
 --
--- TOC entry 4883 (class 2606 OID 55687)
+-- TOC entry 4883 (class 2606 OID 67935)
 -- Name: dribbled_past dribbled_past_player_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -533421,7 +533421,7 @@ ALTER TABLE ONLY public.dribbled_past
 
 
 --
--- TOC entry 4856 (class 2606 OID 55471)
+-- TOC entry 4856 (class 2606 OID 67719)
 -- Name: duel duel_player_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -533430,7 +533430,7 @@ ALTER TABLE ONLY public.duel
 
 
 --
--- TOC entry 4881 (class 2606 OID 55671)
+-- TOC entry 4881 (class 2606 OID 67919)
 -- Name: error error_player_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -533439,7 +533439,7 @@ ALTER TABLE ONLY public.error
 
 
 --
--- TOC entry 4877 (class 2606 OID 55639)
+-- TOC entry 4877 (class 2606 OID 67887)
 -- Name: fifty_fifty fifty_fifty_player_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -533448,7 +533448,7 @@ ALTER TABLE ONLY public.fifty_fifty
 
 
 --
--- TOC entry 4869 (class 2606 OID 55575)
+-- TOC entry 4869 (class 2606 OID 67823)
 -- Name: foul_committed foul_committed_player_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -533457,7 +533457,7 @@ ALTER TABLE ONLY public.foul_committed
 
 
 --
--- TOC entry 4868 (class 2606 OID 55567)
+-- TOC entry 4868 (class 2606 OID 67815)
 -- Name: foul_won foul_won_player_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -533466,7 +533466,7 @@ ALTER TABLE ONLY public.foul_won
 
 
 --
--- TOC entry 4870 (class 2606 OID 55583)
+-- TOC entry 4870 (class 2606 OID 67831)
 -- Name: goal_keeper goal_keeper_player_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -533475,7 +533475,7 @@ ALTER TABLE ONLY public.goal_keeper
 
 
 --
--- TOC entry 4878 (class 2606 OID 55647)
+-- TOC entry 4878 (class 2606 OID 67895)
 -- Name: half_end half_end_player_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -533484,7 +533484,7 @@ ALTER TABLE ONLY public.half_end
 
 
 --
--- TOC entry 4865 (class 2606 OID 55543)
+-- TOC entry 4865 (class 2606 OID 67791)
 -- Name: half_start half_start_player_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -533493,7 +533493,7 @@ ALTER TABLE ONLY public.half_start
 
 
 --
--- TOC entry 4884 (class 2606 OID 55695)
+-- TOC entry 4884 (class 2606 OID 67943)
 -- Name: injury_stoppage injury_stoppage_player_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -533502,7 +533502,7 @@ ALTER TABLE ONLY public.injury_stoppage
 
 
 --
--- TOC entry 4861 (class 2606 OID 55511)
+-- TOC entry 4861 (class 2606 OID 67759)
 -- Name: interception interception_player_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -533511,7 +533511,7 @@ ALTER TABLE ONLY public.interception
 
 
 --
--- TOC entry 4882 (class 2606 OID 55679)
+-- TOC entry 4882 (class 2606 OID 67927)
 -- Name: miscontrol miscontrol_player_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -533520,7 +533520,7 @@ ALTER TABLE ONLY public.miscontrol
 
 
 --
--- TOC entry 4859 (class 2606 OID 55495)
+-- TOC entry 4859 (class 2606 OID 67743)
 -- Name: offside offside_player_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -533529,7 +533529,7 @@ ALTER TABLE ONLY public.offside
 
 
 --
--- TOC entry 4867 (class 2606 OID 55559)
+-- TOC entry 4867 (class 2606 OID 67807)
 -- Name: own_goal_against own_goal_against_player_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -533538,7 +533538,7 @@ ALTER TABLE ONLY public.own_goal_against
 
 
 --
--- TOC entry 4872 (class 2606 OID 55599)
+-- TOC entry 4872 (class 2606 OID 67847)
 -- Name: own_goal_for own_goal_for_player_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -533547,7 +533547,7 @@ ALTER TABLE ONLY public.own_goal_for
 
 
 --
--- TOC entry 4876 (class 2606 OID 55631)
+-- TOC entry 4876 (class 2606 OID 67879)
 -- Name: pass pass_player_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -533556,7 +533556,7 @@ ALTER TABLE ONLY public.pass
 
 
 --
--- TOC entry 4874 (class 2606 OID 55615)
+-- TOC entry 4874 (class 2606 OID 67863)
 -- Name: player_off player_off_player_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -533565,7 +533565,7 @@ ALTER TABLE ONLY public.player_off
 
 
 --
--- TOC entry 4873 (class 2606 OID 55607)
+-- TOC entry 4873 (class 2606 OID 67855)
 -- Name: player_on player_on_player_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -533574,7 +533574,7 @@ ALTER TABLE ONLY public.player_on
 
 
 --
--- TOC entry 4851 (class 2606 OID 55437)
+-- TOC entry 4851 (class 2606 OID 67685)
 -- Name: player player_person_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -533583,7 +533583,7 @@ ALTER TABLE ONLY public.player
 
 
 --
--- TOC entry 4852 (class 2606 OID 55442)
+-- TOC entry 4852 (class 2606 OID 67690)
 -- Name: player player_season_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -533592,7 +533592,7 @@ ALTER TABLE ONLY public.player
 
 
 --
--- TOC entry 4853 (class 2606 OID 55447)
+-- TOC entry 4853 (class 2606 OID 67695)
 -- Name: player player_team_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -533601,7 +533601,7 @@ ALTER TABLE ONLY public.player
 
 
 --
--- TOC entry 4864 (class 2606 OID 55535)
+-- TOC entry 4864 (class 2606 OID 67783)
 -- Name: pressure pressure_player_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -533610,7 +533610,7 @@ ALTER TABLE ONLY public.pressure
 
 
 --
--- TOC entry 4885 (class 2606 OID 55703)
+-- TOC entry 4885 (class 2606 OID 67951)
 -- Name: referee_ball_drop referee_ball_drop_player_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -533619,7 +533619,7 @@ ALTER TABLE ONLY public.referee_ball_drop
 
 
 --
--- TOC entry 4875 (class 2606 OID 55623)
+-- TOC entry 4875 (class 2606 OID 67871)
 -- Name: shield shield_player_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -533628,7 +533628,7 @@ ALTER TABLE ONLY public.shield
 
 
 --
--- TOC entry 4863 (class 2606 OID 55527)
+-- TOC entry 4863 (class 2606 OID 67775)
 -- Name: shot shot_player_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -533637,7 +533637,7 @@ ALTER TABLE ONLY public.shot
 
 
 --
--- TOC entry 4879 (class 2606 OID 55655)
+-- TOC entry 4879 (class 2606 OID 67903)
 -- Name: starting_xi starting_xi_player_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -533646,7 +533646,7 @@ ALTER TABLE ONLY public.starting_xi
 
 
 --
--- TOC entry 4866 (class 2606 OID 55551)
+-- TOC entry 4866 (class 2606 OID 67799)
 -- Name: substitution substitution_player_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -533655,7 +533655,7 @@ ALTER TABLE ONLY public.substitution
 
 
 --
--- TOC entry 4880 (class 2606 OID 55663)
+-- TOC entry 4880 (class 2606 OID 67911)
 -- Name: tactical_shift tactical_shift_player_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -533663,7 +533663,7 @@ ALTER TABLE ONLY public.tactical_shift
     ADD CONSTRAINT tactical_shift_player_id_fkey FOREIGN KEY (player_id) REFERENCES public.player(player_id);
 
 
--- Completed on 2024-04-07 16:58:01
+-- Completed on 2024-04-07 18:57:02
 
 --
 -- PostgreSQL database dump complete
