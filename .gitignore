@@ -1,3 +1,3 @@
-__pycache__/
-csv/
-json/
+json_loader/json
+__pycache__
+Q_*.csv
