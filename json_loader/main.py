@@ -156,10 +156,10 @@ def populate(cursor):
                         case 5:
                             camera_on.append(common)
                         case 6:
-                            block_ = item.get('block')
-                            deflection = 'deflection' in block_ if block_ else False
-                            offensive = 'offensive' in block_ if block_ else False
-                            save_block = 'save_block' in block_ if block_ else False
+                            block_ = item.get('block', {})
+                            deflection = 'deflection' in block_
+                            offensive = 'offensive' in block_
+                            save_block = 'save_block' in block_
                             block.append(common + (counter_pressure, deflection, offensive, save_block))
                         case 8:
                             offside.append(common)
@@ -172,8 +172,11 @@ def populate(cursor):
                             interception.append(common)
                         case 14:
                             dribble_ = item['dribble']
-                            completed = dribble_['outcome']['id'] == 8
-                            dribble.append(common + (completed, ))
+                            overrun = 'overrun' in dribble_
+                            nutmeg = 'nutmeg' in dribble_
+                            no_touch = 'no_touch' in dribble_
+                            outcome_id = dribble_['outcome']['id']
+                            dribble.append(common + (overrun, nutmeg, no_touch, outcome_id))
                         case 16:
                             shot_ = item['shot']
                             xg = shot_['statsbomb_xg']

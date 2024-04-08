@@ -40,7 +40,7 @@ DROP TABLE IF EXISTS team;
 DROP TABLE IF EXISTS season;
 DROP TABLE IF EXISTS play;
 DROP TABLE IF EXISTS position;
-DROP TABLE IF EXISTS duel_type;
+DROP TABLE IF EXISTS outcome;
 DROP TABLE IF EXISTS body_part;
 '''
 create = '''
@@ -110,19 +110,45 @@ INSERT INTO position VALUES (22, 'Right Center Forward');
 INSERT INTO position VALUES (23, 'Striker');
 INSERT INTO position VALUES (24, 'Left Center Forward');
 INSERT INTO position VALUES (25, 'Secondary Striker');
-CREATE TABLE duel_type (
-    duel_type_id INT PRIMARY KEY,
-    duel_type_name VARCHAR(128)
+CREATE TABLE outcome (
+    outcome_id INT PRIMARY KEY,
+    outcome_name VARCHAR(128)
 );
-INSERT INTO duel_type VALUES (1, 'Lost');
-INSERT INTO duel_type VALUES (4, 'Won');
-INSERT INTO duel_type VALUES (10, 'Aerial Lost');
-INSERT INTO duel_type VALUES (11, 'Tackle');
-INSERT INTO duel_type VALUES (13, 'Lost In Play');
-INSERT INTO duel_type VALUES (14, 'Lost Out');
-INSERT INTO duel_type VALUES (15, 'Success');
-INSERT INTO duel_type VALUES (16, 'Success In Play');
-INSERT INTO duel_type VALUES (17, 'Success Out');
+INSERT INTO outcome VALUES (8, 'Complete');
+INSERT INTO outcome VALUES (9, 'Incomplete');
+INSERT INTO outcome VALUES (1, 'Lost');
+INSERT INTO outcome VALUES (10, 'Aerial Lost');
+INSERT INTO outcome VALUES (109, 'Penalty Saved To Post');
+INSERT INTO outcome VALUES (11, 'Tackle');
+INSERT INTO outcome VALUES (110, 'Saved To Post');
+INSERT INTO outcome VALUES (113, 'Shot Saved Off Target');
+INSERT INTO outcome VALUES (114, 'Shot Saved To Post');
+INSERT INTO outcome VALUES (117, 'Punched Out');
+INSERT INTO outcome VALUES (13, 'Lost In Play');
+INSERT INTO outcome VALUES (14, 'Lost Out');
+INSERT INTO outcome VALUES (15, 'Success');
+INSERT INTO outcome VALUES (16, 'Success In Play');
+INSERT INTO outcome VALUES (17, 'Success Out');
+INSERT INTO outcome VALUES (25, 'Collected');
+INSERT INTO outcome VALUES (26, 'Goal Conceded');
+INSERT INTO outcome VALUES (28, 'Penalty Conceded');
+INSERT INTO outcome VALUES (29, 'Penalty Saved');
+INSERT INTO outcome VALUES (30, 'Punch');
+INSERT INTO outcome VALUES (31, 'Save');
+INSERT INTO outcome VALUES (32, 'Shot Faced');
+INSERT INTO outcome VALUES (33, 'Shot Saved');
+INSERT INTO outcome VALUES (34, 'Smother');
+INSERT INTO outcome VALUES (4, 'Won');
+INSERT INTO outcome VALUES (47, 'Claim');
+INSERT INTO outcome VALUES (48, 'Clear');
+INSERT INTO outcome VALUES (49, 'Collected Twice');
+INSERT INTO outcome VALUES (50, 'Fail');
+INSERT INTO outcome VALUES (51, 'In Play');
+INSERT INTO outcome VALUES (52, 'In Play Danger');
+INSERT INTO outcome VALUES (53, 'In Play Safe');
+INSERT INTO outcome VALUES (55, 'No Touch');
+INSERT INTO outcome VALUES (56, 'Saved Twice');
+INSERT INTO outcome VALUES (58, 'Touched In');
 CREATE TABLE body_part (
     body_part_id INT PRIMARY KEY,
     body_part_name VARCHAR(128)
@@ -161,7 +187,7 @@ CREATE TABLE dispossessed (
 ) INHERITS (common);
 CREATE TABLE duel (
     counter_pressure BOOLEAN,
-    duel_type_id INT,
+    outcome_id INT,
     duel_outcome_id INT
 ) INHERITS (common);
 CREATE TABLE camera_on (
@@ -182,7 +208,11 @@ CREATE TABLE clearance (
 CREATE TABLE interception (
 ) INHERITS (common);
 CREATE TABLE dribble (
-    completed BOOLEAN
+    overrun BOOLEAN,
+    nutmeg BOOLEAN,
+    no_touch BOOLEAN,
+    outcome_id INT,
+    FOREIGN KEY (outcome_id) REFERENCES outcome (outcome_id)
 ) INHERITS (common);
 CREATE TABLE shot (
     xg FLOAT,
@@ -279,7 +309,7 @@ VALUES ((
 ), %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
 '''
 duel = '''
-INSERT INTO duel (player_id, play_id, position_id, period, minute, second, possession, possession_id, x, y, duration, under_pressure, counter_pressure, duel_type_id, duel_outcome_id) 
+INSERT INTO duel (player_id, play_id, position_id, period, minute, second, possession, possession_id, x, y, duration, under_pressure, counter_pressure, outcome_id, duel_outcome_id) 
 VALUES ((
     SELECT player_id 
     FROM player 
@@ -327,12 +357,12 @@ VALUES ((
 ), %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
 '''
 dribble = '''
-INSERT INTO dribble (player_id, play_id, position_id, period, minute, second, possession, possession_id, x, y, duration, under_pressure, completed) 
+INSERT INTO dribble (player_id, play_id, position_id, period, minute, second, possession, possession_id, x, y, duration, under_pressure, overrun, nutmeg, no_touch, outcome_id) 
 VALUES ((
     SELECT player_id 
     FROM player 
     WHERE person_id = %s AND team_id = %s AND season_id = %s 
-), %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+), %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
 '''
 shot = '''
 INSERT INTO shot (player_id, play_id, position_id, period, minute, second, possession, possession_id, x, y, duration, under_pressure, xg, first_time) 

@@ -428,7 +428,7 @@ def Q_9(cursor, conn, execution_time):
     query = """
     SELECT person.person_name, COUNT(dribble.player_id) AS completed_dribbles 
     FROM player 
-    JOIN dribble ON player.player_id = dribble.player_id AND dribble.completed = TRUE 
+    JOIN dribble ON player.player_id = dribble.player_id AND dribble.outcome_id = 8
     JOIN season ON player.season_id = season.season_id 
     JOIN person ON player.person_id = person.person_id 
     WHERE season.competition_name = 'La Liga' AND season.season_name IN ('2018/2019', '2019/2020', '2020/2021') 
