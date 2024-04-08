@@ -1,4 +1,5 @@
 drop = '''
+DROP TABLE IF EXISTS freeze_frame;
 DROP TABLE IF EXISTS ball_recovery;
 DROP TABLE IF EXISTS dispossessed;
 DROP TABLE IF EXISTS duel;
@@ -40,8 +41,7 @@ DROP TABLE IF EXISTS team;
 DROP TABLE IF EXISTS season;
 DROP TABLE IF EXISTS play;
 DROP TABLE IF EXISTS position;
-DROP TABLE IF EXISTS outcome;
-DROP TABLE IF EXISTS body_part;
+DROP TABLE IF EXISTS definition;
 '''
 create = '''
 CREATE TABLE season (
@@ -110,57 +110,87 @@ INSERT INTO position VALUES (22, 'Right Center Forward');
 INSERT INTO position VALUES (23, 'Striker');
 INSERT INTO position VALUES (24, 'Left Center Forward');
 INSERT INTO position VALUES (25, 'Secondary Striker');
-CREATE TABLE outcome (
-    outcome_id INT PRIMARY KEY,
-    outcome_name VARCHAR(128)
+CREATE TABLE definition (
+    definition_id INT PRIMARY KEY,
+    definition_name VARCHAR(128)
 );
-INSERT INTO outcome VALUES (8, 'Complete');
-INSERT INTO outcome VALUES (9, 'Incomplete');
-INSERT INTO outcome VALUES (1, 'Lost');
-INSERT INTO outcome VALUES (10, 'Aerial Lost');
-INSERT INTO outcome VALUES (109, 'Penalty Saved To Post');
-INSERT INTO outcome VALUES (11, 'Tackle');
-INSERT INTO outcome VALUES (110, 'Saved To Post');
-INSERT INTO outcome VALUES (113, 'Shot Saved Off Target');
-INSERT INTO outcome VALUES (114, 'Shot Saved To Post');
-INSERT INTO outcome VALUES (117, 'Punched Out');
-INSERT INTO outcome VALUES (13, 'Lost In Play');
-INSERT INTO outcome VALUES (14, 'Lost Out');
-INSERT INTO outcome VALUES (15, 'Success');
-INSERT INTO outcome VALUES (16, 'Success In Play');
-INSERT INTO outcome VALUES (17, 'Success Out');
-INSERT INTO outcome VALUES (25, 'Collected');
-INSERT INTO outcome VALUES (26, 'Goal Conceded');
-INSERT INTO outcome VALUES (28, 'Penalty Conceded');
-INSERT INTO outcome VALUES (29, 'Penalty Saved');
-INSERT INTO outcome VALUES (30, 'Punch');
-INSERT INTO outcome VALUES (31, 'Save');
-INSERT INTO outcome VALUES (32, 'Shot Faced');
-INSERT INTO outcome VALUES (33, 'Shot Saved');
-INSERT INTO outcome VALUES (34, 'Smother');
-INSERT INTO outcome VALUES (4, 'Won');
-INSERT INTO outcome VALUES (47, 'Claim');
-INSERT INTO outcome VALUES (48, 'Clear');
-INSERT INTO outcome VALUES (49, 'Collected Twice');
-INSERT INTO outcome VALUES (50, 'Fail');
-INSERT INTO outcome VALUES (51, 'In Play');
-INSERT INTO outcome VALUES (52, 'In Play Danger');
-INSERT INTO outcome VALUES (53, 'In Play Safe');
-INSERT INTO outcome VALUES (55, 'No Touch');
-INSERT INTO outcome VALUES (56, 'Saved Twice');
-INSERT INTO outcome VALUES (58, 'Touched In');
-CREATE TABLE body_part (
-    body_part_id INT PRIMARY KEY,
-    body_part_name VARCHAR(128)
-);
-INSERT INTO body_part VALUES (35, 'Both Hands');
-INSERT INTO body_part VALUES (36, 'Chest');
-INSERT INTO body_part VALUES (37, 'Head');
-INSERT INTO body_part VALUES (38, 'Left Foot');
-INSERT INTO body_part VALUES (39, 'Left Hand');
-INSERT INTO body_part VALUES (40, 'Right Foot');
-INSERT INTO body_part VALUES (41, 'Right Hand');
-INSERT INTO body_part VALUES (70, 'Other');
+INSERT INTO definition VALUES (1, 'Lost');
+INSERT INTO definition VALUES (10, 'Aerial Lost');
+INSERT INTO definition VALUES (100, 'Saved');
+INSERT INTO definition VALUES (101, 'Wayward');
+INSERT INTO definition VALUES (104, 'Inswinging');
+INSERT INTO definition VALUES (105, 'Outswinging');
+INSERT INTO definition VALUES (106, 'No Touch');
+INSERT INTO definition VALUES (107, 'Straight');
+INSERT INTO definition VALUES (108, 'Through Ball');
+INSERT INTO definition VALUES (109, 'Penalty Saved To Post');
+INSERT INTO definition VALUES (11, 'Tackle');
+INSERT INTO definition VALUES (110, 'Saved To Post');
+INSERT INTO definition VALUES (113, 'Shot Saved Off Target');
+INSERT INTO definition VALUES (114, 'Shot Saved To Post');
+INSERT INTO definition VALUES (115, 'Saved Off Target');
+INSERT INTO definition VALUES (116, 'Saved To Post');
+INSERT INTO definition VALUES (117, 'Punched Out');
+INSERT INTO definition VALUES (13, 'Lost In Play');
+INSERT INTO definition VALUES (14, 'Lost Out');
+INSERT INTO definition VALUES (15, 'Success');
+INSERT INTO definition VALUES (16, 'Success In Play');
+INSERT INTO definition VALUES (17, 'Success Out');
+INSERT INTO definition VALUES (25, 'Collected');
+INSERT INTO definition VALUES (26, 'Goal Conceded');
+INSERT INTO definition VALUES (28, 'Penalty Conceded');
+INSERT INTO definition VALUES (29, 'Penalty Saved');
+INSERT INTO definition VALUES (30, 'Punch');
+INSERT INTO definition VALUES (31, 'Save');
+INSERT INTO definition VALUES (32, 'Shot Faced');
+INSERT INTO definition VALUES (33, 'Shot Saved');
+INSERT INTO definition VALUES (34, 'Smother');
+INSERT INTO definition VALUES (35, 'Both Hands');
+INSERT INTO definition VALUES (36, 'Chest');
+INSERT INTO definition VALUES (37, 'Head');
+INSERT INTO definition VALUES (38, 'Left Foot');
+INSERT INTO definition VALUES (39, 'Left Hand');
+INSERT INTO definition VALUES (4, 'Won');
+INSERT INTO definition VALUES (40, 'Right Foot');
+INSERT INTO definition VALUES (41, 'Right Hand');
+INSERT INTO definition VALUES (47, 'Claim');
+INSERT INTO definition VALUES (48, 'Clear');
+INSERT INTO definition VALUES (49, 'Collected Twice');
+INSERT INTO definition VALUES (50, 'Fail');
+INSERT INTO definition VALUES (51, 'In Play');
+INSERT INTO definition VALUES (52, 'In Play Danger');
+INSERT INTO definition VALUES (53, 'In Play Safe');
+INSERT INTO definition VALUES (55, 'No Touch');
+INSERT INTO definition VALUES (56, 'Saved Twice');
+INSERT INTO definition VALUES (58, 'Touched In');
+INSERT INTO definition VALUES (61, 'Corner');
+INSERT INTO definition VALUES (62, 'Free Kick');
+INSERT INTO definition VALUES (63, 'Goal Kick');
+INSERT INTO definition VALUES (64, 'Interception');
+INSERT INTO definition VALUES (65, 'Kick Off');
+INSERT INTO definition VALUES (66, 'Recovery');
+INSERT INTO definition VALUES (67, 'Throw In');
+INSERT INTO definition VALUES (68, 'Drop Kick');
+INSERT INTO definition VALUES (70, 'Other');
+INSERT INTO definition VALUES (74, 'Injury Clearance');
+INSERT INTO definition VALUES (75, 'Out');
+INSERT INTO definition VALUES (76, 'Pass Offside');
+INSERT INTO definition VALUES (77, 'Unknown');
+INSERT INTO definition VALUES (8, 'Complete');
+INSERT INTO definition VALUES (87, 'Open Play');
+INSERT INTO definition VALUES (88, 'Penalty');
+INSERT INTO definition VALUES (89, 'Through Ball');
+INSERT INTO definition VALUES (9, 'Incomplete');
+INSERT INTO definition VALUES (90, 'Diving Header');
+INSERT INTO definition VALUES (91, 'Half Volley');
+INSERT INTO definition VALUES (92, 'Lob');
+INSERT INTO definition VALUES (93, 'Normal');
+INSERT INTO definition VALUES (94, 'Overhead Kick');
+INSERT INTO definition VALUES (95, 'Volley');
+INSERT INTO definition VALUES (96, 'Blocked');
+INSERT INTO definition VALUES (97, 'Goal');
+INSERT INTO definition VALUES (98, 'Off Target');
+INSERT INTO definition VALUES (99, 'Post');
 CREATE TABLE common (
     player_id INT,
     play_id INT,
@@ -170,8 +200,8 @@ CREATE TABLE common (
     second INT,
     possession INT,
     possession_id INT,
-    x INT,
-    y INT,
+    x FLOAT,
+    y FLOAT,
     duration FLOAT,
     under_pressure BOOLEAN,
     FOREIGN KEY (player_id) REFERENCES player (player_id),
@@ -187,8 +217,10 @@ CREATE TABLE dispossessed (
 ) INHERITS (common);
 CREATE TABLE duel (
     counter_pressure BOOLEAN,
+    type_id INT,
     outcome_id INT,
-    duel_outcome_id INT
+    FOREIGN KEY (type_id) REFERENCES definition (definition_id),
+    FOREIGN KEY (outcome_id) REFERENCES definition (definition_id)
 ) INHERITS (common);
 CREATE TABLE camera_on (
 ) INHERITS (common);
@@ -203,7 +235,7 @@ CREATE TABLE offside (
 CREATE TABLE clearance (
     aerial_won BOOLEAN,
     body_part_id INT,
-    FOREIGN KEY (body_part_id) REFERENCES body_part (body_part_id)
+    FOREIGN KEY (body_part_id) REFERENCES definition (definition_id)
 ) INHERITS (common);
 CREATE TABLE interception (
 ) INHERITS (common);
@@ -212,11 +244,27 @@ CREATE TABLE dribble (
     nutmeg BOOLEAN,
     no_touch BOOLEAN,
     outcome_id INT,
-    FOREIGN KEY (outcome_id) REFERENCES outcome (outcome_id)
+    FOREIGN KEY (outcome_id) REFERENCES definition (definition_id)
 ) INHERITS (common);
 CREATE TABLE shot (
+    shot_id INT PRIMARY KEY,
+    end_x FLOAT,
+    end_y FLOAT,
+    end_z FLOAT,
+    aerial_won BOOLEAN,
+    follows_dribble BOOLEAN,
+    open_goal BOOLEAN,
     xg FLOAT,
-    first_time BOOLEAN
+    deflected BOOLEAN,
+    technique_id INT,
+    first_time BOOLEAN,
+    body_part_id INT,
+    type_id INT,
+    outcome_id INT,
+    FOREIGN KEY (technique_id) REFERENCES definition (definition_id),
+    FOREIGN KEY (body_part_id) REFERENCES definition (definition_id),
+    FOREIGN KEY (type_id) REFERENCES definition (definition_id),
+    FOREIGN KEY (outcome_id) REFERENCES definition (definition_id)
 ) INHERITS (common);
 CREATE TABLE pressure (
 ) INHERITS (common);
@@ -269,6 +317,16 @@ CREATE TABLE ball_receipt (
 ) INHERITS (common);
 CREATE TABLE carry (
 ) INHERITS (common);
+CREATE TABLE freeze_frame (
+    player_id INT,
+    shot_id INT,
+    x FLOAT,
+    y FLOAT,
+    position_id INT,
+    FOREIGN KEY (shot_id) REFERENCES shot (shot_id),
+    FOREIGN KEY (player_id) REFERENCES player (player_id),
+    FOREIGN KEY (position_id) REFERENCES position (position_id)
+);
 '''
 season = '''
 INSERT INTO season (competition_name, season_name)
@@ -309,7 +367,7 @@ VALUES ((
 ), %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
 '''
 duel = '''
-INSERT INTO duel (player_id, play_id, position_id, period, minute, second, possession, possession_id, x, y, duration, under_pressure, counter_pressure, outcome_id, duel_outcome_id) 
+INSERT INTO duel (player_id, play_id, position_id, period, minute, second, possession, possession_id, x, y, duration, under_pressure, counter_pressure, type_id, outcome_id) 
 VALUES ((
     SELECT player_id 
     FROM player 
@@ -365,12 +423,12 @@ VALUES ((
 ), %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
 '''
 shot = '''
-INSERT INTO shot (player_id, play_id, position_id, period, minute, second, possession, possession_id, x, y, duration, under_pressure, xg, first_time) 
+INSERT INTO shot (player_id, play_id, position_id, period, minute, second, possession, possession_id, x, y, duration, under_pressure, shot_id, xg, first_time, end_x, end_y, end_z, aerial_won, follows_dribble, open_goal, deflected, technique_id, body_part_id, type_id, outcome_id) 
 VALUES ((
     SELECT player_id 
     FROM player 
     WHERE person_id = %s AND team_id = %s AND season_id = %s 
-), %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+), %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
 '''
 pressure = '''
 INSERT INTO pressure (player_id, play_id, position_id, period, minute, second, possession, possession_id, x, y, duration, under_pressure) 
@@ -563,4 +621,12 @@ VALUES ((
     FROM player 
     WHERE person_id = %s AND team_id = %s AND season_id = %s 
 ), %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+'''
+freeze_frame = '''
+INSERT INTO freeze_frame (player_id, shot_id, x, y, position_id)
+VALUES ((
+    SELECT player_id 
+    FROM player 
+    WHERE person_id = %s AND team_id = %s AND season_id = %s 
+), %s, %s, %s, %s)
 '''

@@ -96,6 +96,8 @@ def populate(cursor):
     referee_ball_drop = []
     ball_receipt = []
     carry = []
+    freeze_frame = []
+    shot_id = 0
     with cd('json'):
         matches = glob.glob(os.path.join('data', 'matches', '**', '*.json'))
         for path in matches:
@@ -103,6 +105,8 @@ def populate(cursor):
                 data = json.load(file)
             for item in data:
                 match_id = str(item['match_id'])
+                home_team_id = item['home_team']['home_team_id']
+                away_team_id = item['away_team']['away_team_id']
                 competition_name = item['competition']['competition_name']
                 season_name = item['season']['season_name']
                 cursor.execute(sql.season, (competition_name, season_name))
@@ -160,7 +164,8 @@ def populate(cursor):
                             deflection = 'deflection' in block_
                             offensive = 'offensive' in block_
                             save_block = 'save_block' in block_
-                            block.append(common + (counter_pressure, deflection, offensive, save_block))
+                            block.append(common + (counter_pressure, deflection, offensive,
+                                save_block))
                         case 8:
                             offside.append(common)
                         case 9:
@@ -181,7 +186,31 @@ def populate(cursor):
                             shot_ = item['shot']
                             xg = shot_['statsbomb_xg']
                             first_time = 'first_time' in shot_
-                            shot.append(common + (xg, first_time))
+                            end_x = shot_['end_location'][0]
+                            end_y = shot_['end_location'][1]
+                            end_z = shot_['end_location'][2] if len(shot_['end_location']) > 2 else 0
+                            aerial_won = 'aerial_won' in shot_
+                            follows_dribble = 'follows_dribble' in shot_
+                            open_goal = 'open_goal' in shot_
+                            deflected = 'defleceted' in shot_
+                            technique_id = shot_['technique']['id']
+                            body_part_id = shot_['body_part']['id']
+                            type_id = shot_['type']['id']
+                            outcome_id = shot_['outcome']['id']
+                            shot.append(common + (shot_id, xg, first_time, end_x,
+                                end_y, end_z, aerial_won, follows_dribble, open_goal,
+                                deflected, technique_id, body_part_id, type_id, outcome_id))
+                            for frame in shot_.get('freeze_frame', []):
+                                x_ = frame['location'][0]
+                                y_ = frame['location'][1]
+                                person_id = frame['player']['id']
+                                position_id = frame['position']['id']
+                                teammate = frame['teammate']
+                                opposing_team_id = home_team_id if team_id == away_team_id else away_team_id
+                                this_team_id = team_id if teammate else opposing_team_id
+                                freeze_frame.append((person_id, this_team_id, season_id,
+                                    shot_id, x_, y_, position_id))
+                            shot_id += 1
                         case 17:
                             pressure.append(common)
                         case 18:
@@ -269,6 +298,7 @@ def populate(cursor):
     cursor.executemany(sql.referee_ball_drop, referee_ball_drop)
     cursor.executemany(sql.ball_receipt, ball_receipt)
     cursor.executemany(sql.carry, carry)
+    cursor.executemany(sql.freeze_frame, freeze_frame)
 
 def export():
     os.environ['PGPASSWORD'] = password
