@@ -41,6 +41,7 @@ DROP TABLE IF EXISTS season;
 DROP TABLE IF EXISTS play;
 DROP TABLE IF EXISTS position;
 DROP TABLE IF EXISTS duel_type;
+DROP TABLE IF EXISTS body_part;
 '''
 create = '''
 CREATE TABLE season (
@@ -122,6 +123,18 @@ INSERT INTO duel_type VALUES (14, 'Lost Out');
 INSERT INTO duel_type VALUES (15, 'Success');
 INSERT INTO duel_type VALUES (16, 'Success In Play');
 INSERT INTO duel_type VALUES (17, 'Success Out');
+CREATE TABLE body_part (
+    body_part_id INT PRIMARY KEY,
+    body_part_name VARCHAR(128)
+);
+INSERT INTO body_part VALUES (35, 'Both Hands');
+INSERT INTO body_part VALUES (36, 'Chest');
+INSERT INTO body_part VALUES (37, 'Head');
+INSERT INTO body_part VALUES (38, 'Left Foot');
+INSERT INTO body_part VALUES (39, 'Left Hand');
+INSERT INTO body_part VALUES (40, 'Right Foot');
+INSERT INTO body_part VALUES (41, 'Right Hand');
+INSERT INTO body_part VALUES (70, 'Other');
 CREATE TABLE common (
     player_id INT,
     play_id INT,
@@ -135,7 +148,6 @@ CREATE TABLE common (
     y INT,
     duration FLOAT,
     under_pressure BOOLEAN,
-    counter_pressure BOOLEAN,
     FOREIGN KEY (player_id) REFERENCES player (player_id),
     FOREIGN KEY (play_id) REFERENCES play (play_id),
     FOREIGN KEY (position_id) REFERENCES position (position_id),
@@ -148,12 +160,14 @@ CREATE TABLE ball_recovery (
 CREATE TABLE dispossessed (
 ) INHERITS (common);
 CREATE TABLE duel (
+    counter_pressure BOOLEAN,
     duel_type_id INT,
     duel_outcome_id INT
 ) INHERITS (common);
 CREATE TABLE camera_on (
 ) INHERITS (common);
 CREATE TABLE block (
+    counter_pressure BOOLEAN,
     deflection BOOLEAN,
     offensive BOOLEAN,
     save_block BOOLEAN
@@ -161,6 +175,9 @@ CREATE TABLE block (
 CREATE TABLE offside (
 ) INHERITS (common);
 CREATE TABLE clearance (
+    aerial_won BOOLEAN,
+    body_part_id INT,
+    FOREIGN KEY (body_part_id) REFERENCES body_part (body_part_id)
 ) INHERITS (common);
 CREATE TABLE interception (
 ) INHERITS (common);
@@ -246,20 +263,20 @@ VALUES (%s, %s, %s)
 ON CONFLICT ON CONSTRAINT player_unique DO NOTHING;
 '''
 ball_recovery = '''
-INSERT INTO ball_recovery (player_id, play_id, position_id, period, minute, second, possession, possession_id, x, y, duration, under_pressure, counter_pressure, offensive, recovery_failure) 
+INSERT INTO ball_recovery (player_id, play_id, position_id, period, minute, second, possession, possession_id, x, y, duration, under_pressure, offensive, recovery_failure) 
 VALUES ((
     SELECT player_id 
     FROM player 
     WHERE person_id = %s AND team_id = %s AND season_id = %s 
-), %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+), %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
 '''
 dispossessed = '''
-INSERT INTO dispossessed (player_id, play_id, position_id, period, minute, second, possession, possession_id, x, y, duration, under_pressure, counter_pressure) 
+INSERT INTO dispossessed (player_id, play_id, position_id, period, minute, second, possession, possession_id, x, y, duration, under_pressure) 
 VALUES ((
     SELECT player_id 
     FROM player 
     WHERE person_id = %s AND team_id = %s AND season_id = %s 
-), %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+), %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
 '''
 duel = '''
 INSERT INTO duel (player_id, play_id, position_id, period, minute, second, possession, possession_id, x, y, duration, under_pressure, counter_pressure, duel_type_id, duel_outcome_id) 
@@ -270,12 +287,12 @@ VALUES ((
 ), %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
 '''
 camera_on = '''
-INSERT INTO camera_on (player_id, play_id, position_id, period, minute, second, possession, possession_id, x, y, duration, under_pressure, counter_pressure) 
+INSERT INTO camera_on (player_id, play_id, position_id, period, minute, second, possession, possession_id, x, y, duration, under_pressure) 
 VALUES ((
     SELECT player_id 
     FROM player 
     WHERE person_id = %s AND team_id = %s AND season_id = %s 
-), %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+), %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
 '''
 block = '''
 INSERT INTO block (player_id, play_id, position_id, period, minute, second, possession, possession_id, x, y, duration, under_pressure, counter_pressure, deflection, offensive, save_block) 
@@ -286,234 +303,234 @@ VALUES ((
 ), %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
 '''
 offside = '''
-INSERT INTO offside (player_id, play_id, position_id, period, minute, second, possession, possession_id, x, y, duration, under_pressure, counter_pressure) 
+INSERT INTO offside (player_id, play_id, position_id, period, minute, second, possession, possession_id, x, y, duration, under_pressure) 
 VALUES ((
     SELECT player_id 
     FROM player 
     WHERE person_id = %s AND team_id = %s AND season_id = %s 
-), %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+), %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
 '''
 clearance = '''
-INSERT INTO clearance (player_id, play_id, position_id, period, minute, second, possession, possession_id, x, y, duration, under_pressure, counter_pressure) 
+INSERT INTO clearance (player_id, play_id, position_id, period, minute, second, possession, possession_id, x, y, duration, under_pressure, aerial_won, body_part_id) 
 VALUES ((
     SELECT player_id 
     FROM player 
     WHERE person_id = %s AND team_id = %s AND season_id = %s 
-), %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+), %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
 '''
 interception = '''
-INSERT INTO interception (player_id, play_id, position_id, period, minute, second, possession, possession_id, x, y, duration, under_pressure, counter_pressure) 
+INSERT INTO interception (player_id, play_id, position_id, period, minute, second, possession, possession_id, x, y, duration, under_pressure) 
 VALUES ((
     SELECT player_id 
     FROM player 
     WHERE person_id = %s AND team_id = %s AND season_id = %s 
-), %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+), %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
 '''
 dribble = '''
-INSERT INTO dribble (player_id, play_id, position_id, period, minute, second, possession, possession_id, x, y, duration, under_pressure, counter_pressure, completed) 
+INSERT INTO dribble (player_id, play_id, position_id, period, minute, second, possession, possession_id, x, y, duration, under_pressure, completed) 
 VALUES ((
     SELECT player_id 
     FROM player 
     WHERE person_id = %s AND team_id = %s AND season_id = %s 
-), %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+), %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
 '''
 shot = '''
-INSERT INTO shot (player_id, play_id, position_id, period, minute, second, possession, possession_id, x, y, duration, under_pressure, counter_pressure, xg, first_time) 
+INSERT INTO shot (player_id, play_id, position_id, period, minute, second, possession, possession_id, x, y, duration, under_pressure, xg, first_time) 
 VALUES ((
     SELECT player_id 
     FROM player 
     WHERE person_id = %s AND team_id = %s AND season_id = %s 
-), %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+), %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
 '''
 pressure = '''
-INSERT INTO pressure (player_id, play_id, position_id, period, minute, second, possession, possession_id, x, y, duration, under_pressure, counter_pressure) 
+INSERT INTO pressure (player_id, play_id, position_id, period, minute, second, possession, possession_id, x, y, duration, under_pressure) 
 VALUES ((
     SELECT player_id 
     FROM player 
     WHERE person_id = %s AND team_id = %s AND season_id = %s 
-), %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+), %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
 '''
 half_start = '''
-INSERT INTO half_start (player_id, play_id, position_id, period, minute, second, possession, possession_id, x, y, duration, under_pressure, counter_pressure) 
+INSERT INTO half_start (player_id, play_id, position_id, period, minute, second, possession, possession_id, x, y, duration, under_pressure) 
 VALUES ((
     SELECT player_id 
     FROM player 
     WHERE person_id = %s AND team_id = %s AND season_id = %s 
-), %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+), %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
 '''
 substitution = '''
-INSERT INTO substitution (player_id, play_id, position_id, period, minute, second, possession, possession_id, x, y, duration, under_pressure, counter_pressure) 
+INSERT INTO substitution (player_id, play_id, position_id, period, minute, second, possession, possession_id, x, y, duration, under_pressure) 
 VALUES ((
     SELECT player_id 
     FROM player 
     WHERE person_id = %s AND team_id = %s AND season_id = %s 
-), %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+), %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
 '''
 own_goal_against = '''
-INSERT INTO own_goal_against (player_id, play_id, position_id, period, minute, second, possession, possession_id, x, y, duration, under_pressure, counter_pressure) 
+INSERT INTO own_goal_against (player_id, play_id, position_id, period, minute, second, possession, possession_id, x, y, duration, under_pressure) 
 VALUES ((
     SELECT player_id 
     FROM player 
     WHERE person_id = %s AND team_id = %s AND season_id = %s 
-), %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+), %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
 '''
 foul_won = '''
-INSERT INTO foul_won (player_id, play_id, position_id, period, minute, second, possession, possession_id, x, y, duration, under_pressure, counter_pressure) 
+INSERT INTO foul_won (player_id, play_id, position_id, period, minute, second, possession, possession_id, x, y, duration, under_pressure) 
 VALUES ((
     SELECT player_id 
     FROM player 
     WHERE person_id = %s AND team_id = %s AND season_id = %s 
-), %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+), %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
 '''
 foul_committed = '''
-INSERT INTO foul_committed (player_id, play_id, position_id, period, minute, second, possession, possession_id, x, y, duration, under_pressure, counter_pressure) 
+INSERT INTO foul_committed (player_id, play_id, position_id, period, minute, second, possession, possession_id, x, y, duration, under_pressure) 
 VALUES ((
     SELECT player_id 
     FROM player 
     WHERE person_id = %s AND team_id = %s AND season_id = %s 
-), %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+), %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
 '''
 goal_keeper = '''
-INSERT INTO goal_keeper (player_id, play_id, position_id, period, minute, second, possession, possession_id, x, y, duration, under_pressure, counter_pressure) 
+INSERT INTO goal_keeper (player_id, play_id, position_id, period, minute, second, possession, possession_id, x, y, duration, under_pressure) 
 VALUES ((
     SELECT player_id 
     FROM player 
     WHERE person_id = %s AND team_id = %s AND season_id = %s 
-), %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+), %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
 '''
 bad_behaviour = '''
-INSERT INTO bad_behaviour (player_id, play_id, position_id, period, minute, second, possession, possession_id, x, y, duration, under_pressure, counter_pressure) 
+INSERT INTO bad_behaviour (player_id, play_id, position_id, period, minute, second, possession, possession_id, x, y, duration, under_pressure) 
 VALUES ((
     SELECT player_id 
     FROM player 
     WHERE person_id = %s AND team_id = %s AND season_id = %s 
-), %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+), %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
 '''
 own_goal_for = '''
-INSERT INTO own_goal_for (player_id, play_id, position_id, period, minute, second, possession, possession_id, x, y, duration, under_pressure, counter_pressure, team_id) 
+INSERT INTO own_goal_for (player_id, play_id, position_id, period, minute, second, possession, possession_id, x, y, duration, under_pressure, team_id) 
 VALUES ((
     SELECT player_id 
     FROM player 
     WHERE person_id = %s AND team_id = %s AND season_id = %s 
-), %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+), %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
 '''
 player_on = '''
-INSERT INTO player_on (player_id, play_id, position_id, period, minute, second, possession, possession_id, x, y, duration, under_pressure, counter_pressure) 
+INSERT INTO player_on (player_id, play_id, position_id, period, minute, second, possession, possession_id, x, y, duration, under_pressure) 
 VALUES ((
     SELECT player_id 
     FROM player 
     WHERE person_id = %s AND team_id = %s AND season_id = %s 
-), %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+), %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
 '''
 player_off = '''
-INSERT INTO player_off (player_id, play_id, position_id, period, minute, second, possession, possession_id, x, y, duration, under_pressure, counter_pressure) 
+INSERT INTO player_off (player_id, play_id, position_id, period, minute, second, possession, possession_id, x, y, duration, under_pressure) 
 VALUES ((
     SELECT player_id 
     FROM player 
     WHERE person_id = %s AND team_id = %s AND season_id = %s 
-), %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+), %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
 '''
 shield = '''
-INSERT INTO shield (player_id, play_id, position_id, period, minute, second, possession, possession_id, x, y, duration, under_pressure, counter_pressure) 
+INSERT INTO shield (player_id, play_id, position_id, period, minute, second, possession, possession_id, x, y, duration, under_pressure) 
 VALUES ((
     SELECT player_id 
     FROM player 
     WHERE person_id = %s AND team_id = %s AND season_id = %s 
-), %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+), %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
 '''
 pass_ = '''
-INSERT INTO pass (player_id, play_id, position_id, period, minute, second, possession, possession_id, x, y, duration, under_pressure, counter_pressure, through_ball) 
+INSERT INTO pass (player_id, play_id, position_id, period, minute, second, possession, possession_id, x, y, duration, under_pressure, through_ball) 
 VALUES ((
     SELECT player_id 
     FROM player 
     WHERE person_id = %s AND team_id = %s AND season_id = %s 
-), %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+), %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
 '''
 fifty_fifty = '''
-INSERT INTO fifty_fifty (player_id, play_id, position_id, period, minute, second, possession, possession_id, x, y, duration, under_pressure, counter_pressure) 
+INSERT INTO fifty_fifty (player_id, play_id, position_id, period, minute, second, possession, possession_id, x, y, duration, under_pressure) 
 VALUES ((
     SELECT player_id 
     FROM player 
     WHERE person_id = %s AND team_id = %s AND season_id = %s 
-), %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+), %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
 '''
 half_end = '''
-INSERT INTO half_end (player_id, play_id, position_id, period, minute, second, possession, possession_id, x, y, duration, under_pressure, counter_pressure) 
+INSERT INTO half_end (player_id, play_id, position_id, period, minute, second, possession, possession_id, x, y, duration, under_pressure) 
 VALUES ((
     SELECT player_id 
     FROM player 
     WHERE person_id = %s AND team_id = %s AND season_id = %s 
-), %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+), %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
 '''
 starting_xi = '''
-INSERT INTO starting_xi (player_id, play_id, position_id, period, minute, second, possession, possession_id, x, y, duration, under_pressure, counter_pressure) 
+INSERT INTO starting_xi (player_id, play_id, position_id, period, minute, second, possession, possession_id, x, y, duration, under_pressure) 
 VALUES ((
     SELECT player_id 
     FROM player 
     WHERE person_id = %s AND team_id = %s AND season_id = %s 
-), %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+), %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
 '''
 tactical_shift = '''
-INSERT INTO tactical_shift (player_id, play_id, position_id, period, minute, second, possession, possession_id, x, y, duration, under_pressure, counter_pressure) 
+INSERT INTO tactical_shift (player_id, play_id, position_id, period, minute, second, possession, possession_id, x, y, duration, under_pressure) 
 VALUES ((
     SELECT player_id 
     FROM player 
     WHERE person_id = %s AND team_id = %s AND season_id = %s 
-), %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+), %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
 '''
 error = '''
-INSERT INTO error (player_id, play_id, position_id, period, minute, second, possession, possession_id, x, y, duration, under_pressure, counter_pressure) 
+INSERT INTO error (player_id, play_id, position_id, period, minute, second, possession, possession_id, x, y, duration, under_pressure) 
 VALUES ((
     SELECT player_id 
     FROM player 
     WHERE person_id = %s AND team_id = %s AND season_id = %s 
-), %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+), %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
 '''
 miscontrol = '''
-INSERT INTO miscontrol (player_id, play_id, position_id, period, minute, second, possession, possession_id, x, y, duration, under_pressure, counter_pressure) 
+INSERT INTO miscontrol (player_id, play_id, position_id, period, minute, second, possession, possession_id, x, y, duration, under_pressure) 
 VALUES ((
     SELECT player_id 
     FROM player 
     WHERE person_id = %s AND team_id = %s AND season_id = %s 
-), %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+), %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
 '''
 dribbled_past = '''
-INSERT INTO dribbled_past (player_id, play_id, position_id, period, minute, second, possession, possession_id, x, y, duration, under_pressure, counter_pressure) 
+INSERT INTO dribbled_past (player_id, play_id, position_id, period, minute, second, possession, possession_id, x, y, duration, under_pressure) 
 VALUES ((
     SELECT player_id 
     FROM player 
     WHERE person_id = %s AND team_id = %s AND season_id = %s 
-), %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+), %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
 '''
 injury_stoppage = '''
-INSERT INTO injury_stoppage (player_id, play_id, position_id, period, minute, second, possession, possession_id, x, y, duration, under_pressure, counter_pressure) 
+INSERT INTO injury_stoppage (player_id, play_id, position_id, period, minute, second, possession, possession_id, x, y, duration, under_pressure) 
 VALUES ((
     SELECT player_id 
     FROM player 
     WHERE person_id = %s AND team_id = %s AND season_id = %s 
-), %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+), %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
 '''
 referee_ball_drop = '''
-INSERT INTO referee_ball_drop (player_id, play_id, position_id, period, minute, second, possession, possession_id, x, y, duration, under_pressure, counter_pressure) 
+INSERT INTO referee_ball_drop (player_id, play_id, position_id, period, minute, second, possession, possession_id, x, y, duration, under_pressure) 
 VALUES ((
     SELECT player_id 
     FROM player 
     WHERE person_id = %s AND team_id = %s AND season_id = %s 
-), %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+), %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
 '''
 ball_receipt = '''
-INSERT INTO ball_receipt (player_id, play_id, position_id, period, minute, second, possession, possession_id, x, y, duration, under_pressure, counter_pressure) 
+INSERT INTO ball_receipt (player_id, play_id, position_id, period, minute, second, possession, possession_id, x, y, duration, under_pressure) 
 VALUES ((
     SELECT player_id 
     FROM player 
     WHERE person_id = %s AND team_id = %s AND season_id = %s 
-), %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+), %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
 '''
 carry = '''
-INSERT INTO carry (player_id, play_id, position_id, period, minute, second, possession, possession_id, x, y, duration, under_pressure, counter_pressure) 
+INSERT INTO carry (player_id, play_id, position_id, period, minute, second, possession, possession_id, x, y, duration, under_pressure) 
 VALUES ((
     SELECT player_id 
     FROM player 
     WHERE person_id = %s AND team_id = %s AND season_id = %s 
-), %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+), %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
 '''

@@ -136,10 +136,10 @@ def populate(cursor):
                     x, y = item.get('location', [0, 0])
                     duration = item.get('duration', 0)
                     under_pressure = 'under_pressure' in item
-                    counterpress = 'counterpress' in item
+                    counter_pressure = 'counterpress' in item
                     common = (person_id, team_id, season_id, play_id, position_id,
                         period, minute, second, possession, possession_id, x, y,
-                        duration, under_pressure, counterpress)
+                        duration, under_pressure)
                     match type_id:
                         case 2:
                             ball_recovery_ = item.get('ball_recovery', {})
@@ -152,7 +152,7 @@ def populate(cursor):
                             duel_ = item['duel']
                             duel_type_id = duel_['type']['id']
                             duel_outcome_id = duel_.get('outcome', {}).get('id')
-                            duel.append(common + (duel_type_id, duel_outcome_id))
+                            duel.append(common + (counter_pressure, duel_type_id, duel_outcome_id))
                         case 5:
                             camera_on.append(common)
                         case 6:
@@ -160,11 +160,14 @@ def populate(cursor):
                             deflection = 'deflection' in block_ if block_ else False
                             offensive = 'offensive' in block_ if block_ else False
                             save_block = 'save_block' in block_ if block_ else False
-                            block.append(common + (deflection, offensive, save_block))
+                            block.append(common + (counter_pressure, deflection, offensive, save_block))
                         case 8:
                             offside.append(common)
                         case 9:
-                            clearance.append(common)
+                            clearance_ = item.get('clearance')
+                            aerial_won = 'aerial_won' in clearance_
+                            body_part_id = clearance_['body_part']['id']
+                            clearance.append(common + (aerial_won, body_part_id))
                         case 10:
                             interception.append(common)
                         case 14:
