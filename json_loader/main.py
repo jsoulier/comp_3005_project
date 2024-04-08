@@ -125,82 +125,97 @@ def populate(cursor):
                     type_id = item['type']['id']
                     person_id = item.get('player', {}).get('id')
                     team_id = item.get('team', {}).get('id')
+                    play_id = item.get('play_pattern', {}).get('id')
+                    position_id = item.get('position', {}).get('id')
+                    period = item.get('period', 0)
+                    minute = item.get('minute', 0)
+                    second = item.get('second', 0)
+                    possession = item.get('possession', 0)
+                    possession_id = item.get('possession_team', {}).get('id')
+                    x, y = item.get('location', [0, 0])
+                    duration = item.get('duration', 0)
+                    under_pressure = 'under_pressure' in item
+                    counter_pressure = 'counter_pressure' in item
+                    common = (person_id, team_id, season_id, play_id, position_id, period, minute, second, possession, possession_id, x, y, duration, under_pressure, counter_pressure)
                     match type_id:
                         case 2:
-                            ball_recovery.append((person_id, team_id, season_id))
+                            ball_recovery.append(common)
                         case 3:
-                            dispossessed.append((person_id, team_id, season_id))
+                            dispossessed.append(common)
                         case 4:
-                            duel.append((person_id, team_id, season_id))
+                            duel_ = item['duel']
+                            duel_type_id = duel_['type']['id']
+                            duel_outcome_id = duel_.get('outcome', {}).get('id')
+                            duel.append(common + (duel_type_id, duel_outcome_id))
                         case 5:
-                            camera_on.append((person_id, team_id, season_id))
+                            camera_on.append(common)
                         case 6:
-                            block.append((person_id, team_id, season_id))
+                            block.append(common)
                         case 8:
-                            offside.append((person_id, team_id, season_id))
+                            offside.append(common)
                         case 9:
-                            clearance.append((person_id, team_id, season_id))
+                            clearance.append(common)
                         case 10:
-                            interception.append((person_id, team_id, season_id))
+                            interception.append(common)
                         case 14:
                             dribble_ = item['dribble']
                             completed = dribble_['outcome']['id'] == 8
-                            dribble.append((person_id, team_id, season_id, completed))
+                            dribble.append(common + (completed, ))
                         case 16:
                             shot_ = item['shot']
                             xg = shot_['statsbomb_xg']
                             first_time = 'first_time' in shot_
-                            shot.append((person_id, team_id, season_id, xg, first_time))
+                            shot.append(common + (xg, first_time))
                         case 17:
-                            pressure.append((person_id, team_id, season_id))
+                            pressure.append(common)
                         case 18:
-                            half_start.append((person_id, team_id, season_id))
+                            half_start.append(common)
                         case 19:
-                            substitution.append((person_id, team_id, season_id))
+                            substitution.append(common)
                         case 20:
-                            own_goal_against.append((person_id, team_id, season_id))
+                            own_goal_against.append(common)
                         case 21:
-                            foul_won.append((person_id, team_id, season_id))
+                            foul_won.append(common)
                         case 22:
-                            foul_committed.append((person_id, team_id, season_id))
+                            foul_committed.append(common)
                         case 23:
-                            goal_keeper.append((person_id, team_id, season_id))
+                            goal_keeper.append(common)
                         case 24:
-                            bad_behaviour.append((person_id, team_id, season_id))
+                            bad_behaviour.append(common)
                         case 25:
-                            own_goal_for.append((person_id, team_id, season_id))
+                            own_goal_for.append(common + (team_id, ))
                         case 26:
-                            player_on.append((person_id, team_id, season_id))
+                            player_on.append(common)
                         case 27:
-                            player_off.append((person_id, team_id, season_id))
+                            player_off.append(common)
                         case 28:
-                            shield.append((person_id, team_id, season_id))
+                            shield.append(common)
                         case 30:
                             pass__ = item['pass']
                             through_ball = 'through_ball' in pass__
-                            pass_.append((person_id, team_id, season_id, through_ball))
+                            pass_.append(common + (through_ball, ))
                         case 33:
-                            fifty_fifty.append((person_id, team_id, season_id))
+                            fifty_fifty.append(common)
                         case 34:
-                            half_end.append((person_id, team_id, season_id))
+                            half_end.append(common)
                         case 35:
-                            starting_xi.append((person_id, team_id, season_id))
+                            starting_xi.append(common)
                         case 36:
-                            tactical_shift.append((person_id, team_id, season_id))
+                            tactical_shift.append(common)
                         case 37:
-                            error.append((person_id, team_id, season_id))
+                            error.append(common)
                         case 38:
-                            miscontrol.append((person_id, team_id, season_id))
+                            miscontrol.append(common)
                         case 39:
-                            dribbled_past.append((person_id, team_id, season_id))
+                            dribbled_past.append(common)
                         case 40:
-                            injury_stoppage.append((person_id, team_id, season_id))
+                            injury_stoppage.append(common)
                         case 41:
-                            referee_ball_drop.append((person_id, team_id, season_id))
+                            referee_ball_drop.append(common)
                         case 42:
-                            ball_receipt.append((person_id, team_id, season_id))
+                            ball_receipt.append(common)
                         case 43:
-                            carry.append((person_id, team_id, season_id))
+                            carry.append(common)
     cursor.executemany(sql.person, person)
     cursor.executemany(sql.team, team)
     cursor.executemany(sql.player, player)
