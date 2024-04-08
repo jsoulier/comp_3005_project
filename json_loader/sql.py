@@ -33,7 +33,7 @@ DROP TABLE IF EXISTS injury_stoppage;
 DROP TABLE IF EXISTS referee_ball_drop;
 DROP TABLE IF EXISTS ball_receipt;
 DROP TABLE IF EXISTS carry;
-DROP TABLE IF EXISTS event;
+DROP TABLE IF EXISTS common;
 DROP TABLE IF EXISTS player;
 DROP TABLE IF EXISTS person;
 DROP TABLE IF EXISTS team;
@@ -106,8 +106,9 @@ INSERT INTO position VALUES (19, 'Center Attacking Midfield');
 INSERT INTO position VALUES (20, 'Left Attacking Midfield');
 INSERT INTO position VALUES (21, 'Left Wing');
 INSERT INTO position VALUES (22, 'Right Center Forward');
-INSERT INTO position VALUES (23, 'Center Forward');
+INSERT INTO position VALUES (23, 'Striker');
 INSERT INTO position VALUES (24, 'Left Center Forward');
+INSERT INTO position VALUES (25, 'Secondary Striker');
 CREATE TABLE duel_type (
     duel_type_id INT PRIMARY KEY,
     duel_type_name VARCHAR(128)
@@ -141,6 +142,8 @@ CREATE TABLE common (
     FOREIGN KEY (possession_id) REFERENCES team (team_id)
 );
 CREATE TABLE ball_recovery (
+    offensive BOOLEAN,
+    recovery_failure BOOLEAN
 ) INHERITS (common);
 CREATE TABLE dispossessed (
 ) INHERITS (common);
@@ -151,6 +154,9 @@ CREATE TABLE duel (
 CREATE TABLE camera_on (
 ) INHERITS (common);
 CREATE TABLE block (
+    deflection BOOLEAN,
+    offensive BOOLEAN,
+    save_block BOOLEAN
 ) INHERITS (common);
 CREATE TABLE offside (
 ) INHERITS (common);
@@ -240,12 +246,12 @@ VALUES (%s, %s, %s)
 ON CONFLICT ON CONSTRAINT player_unique DO NOTHING;
 '''
 ball_recovery = '''
-INSERT INTO ball_recovery (player_id, play_id, position_id, period, minute, second, possession, possession_id, x, y, duration, under_pressure, counter_pressure) 
+INSERT INTO ball_recovery (player_id, play_id, position_id, period, minute, second, possession, possession_id, x, y, duration, under_pressure, counter_pressure, offensive, recovery_failure) 
 VALUES ((
     SELECT player_id 
     FROM player 
     WHERE person_id = %s AND team_id = %s AND season_id = %s 
-), %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+), %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
 '''
 dispossessed = '''
 INSERT INTO dispossessed (player_id, play_id, position_id, period, minute, second, possession, possession_id, x, y, duration, under_pressure, counter_pressure) 
@@ -272,12 +278,12 @@ VALUES ((
 ), %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
 '''
 block = '''
-INSERT INTO block (player_id, play_id, position_id, period, minute, second, possession, possession_id, x, y, duration, under_pressure, counter_pressure) 
+INSERT INTO block (player_id, play_id, position_id, period, minute, second, possession, possession_id, x, y, duration, under_pressure, counter_pressure, deflection, offensive, save_block) 
 VALUES ((
     SELECT player_id 
     FROM player 
     WHERE person_id = %s AND team_id = %s AND season_id = %s 
-), %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+), %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
 '''
 offside = '''
 INSERT INTO offside (player_id, play_id, position_id, period, minute, second, possession, possession_id, x, y, duration, under_pressure, counter_pressure) 

@@ -13,7 +13,8 @@ username = 'postgres'
 password = '1234'
 host = 'localhost'
 port = '5432'
-seasons = [('La Liga', '2020/2021'), ('La Liga', '2019/2020'), ('La Liga', '2018/2019'), ('Premier League', '2003/2004')]
+seasons = [('La Liga', '2020/2021'), ('La Liga', '2019/2020'),
+    ('La Liga','2018/2019'), ('Premier League', '2003/2004')]
 
 @contextlib.contextmanager
 def cd(path):
@@ -135,11 +136,16 @@ def populate(cursor):
                     x, y = item.get('location', [0, 0])
                     duration = item.get('duration', 0)
                     under_pressure = 'under_pressure' in item
-                    counter_pressure = 'counter_pressure' in item
-                    common = (person_id, team_id, season_id, play_id, position_id, period, minute, second, possession, possession_id, x, y, duration, under_pressure, counter_pressure)
+                    counterpress = 'counterpress' in item
+                    common = (person_id, team_id, season_id, play_id, position_id,
+                        period, minute, second, possession, possession_id, x, y,
+                        duration, under_pressure, counterpress)
                     match type_id:
                         case 2:
-                            ball_recovery.append(common)
+                            ball_recovery_ = item.get('ball_recovery', {})
+                            offensive = 'offensive' in ball_recovery_
+                            recovery_failure = 'recovery_failure' in ball_recovery_
+                            ball_recovery.append(common + (offensive, recovery_failure))
                         case 3:
                             dispossessed.append(common)
                         case 4:
@@ -150,7 +156,11 @@ def populate(cursor):
                         case 5:
                             camera_on.append(common)
                         case 6:
-                            block.append(common)
+                            block_ = item.get('block')
+                            deflection = 'deflection' in block_ if block_ else False
+                            offensive = 'offensive' in block_ if block_ else False
+                            save_block = 'save_block' in block_ if block_ else False
+                            block.append(common + (deflection, offensive, save_block))
                         case 8:
                             offside.append(common)
                         case 9:
