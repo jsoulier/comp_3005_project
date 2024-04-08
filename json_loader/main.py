@@ -188,7 +188,8 @@ def populate(cursor):
                             first_time = 'first_time' in shot_
                             end_x = shot_['end_location'][0]
                             end_y = shot_['end_location'][1]
-                            end_z = shot_['end_location'][2] if len(shot_['end_location']) > 2 else 0
+                            end_z = (shot_['end_location'][2] if
+                                len(shot_['end_location']) > 2 else 0)
                             aerial_won = 'aerial_won' in shot_
                             follows_dribble = 'follows_dribble' in shot_
                             open_goal = 'open_goal' in shot_
@@ -206,17 +207,24 @@ def populate(cursor):
                                 person_id = frame['player']['id']
                                 position_id = frame['position']['id']
                                 teammate = frame['teammate']
-                                opposing_team_id = home_team_id if team_id == away_team_id else away_team_id
+                                opposing_team_id = (home_team_id if team_id ==
+                                    away_team_id else away_team_id)
                                 this_team_id = team_id if teammate else opposing_team_id
                                 freeze_frame.append((person_id, this_team_id, season_id,
                                     shot_id, x_, y_, position_id))
                             shot_id += 1
                         case 17:
-                            pressure.append(common)
+                            pressure.append(common + (counter_pressure, ))
                         case 18:
-                            half_start.append(common)
+                            half_start_ = item.get('half_start', {})
+                            late_video_start = 'late_video_start' in half_start_
+                            half_start.append(common + (late_video_start, ))
                         case 19:
-                            substitution.append(common)
+                            substitution_ = item['substitution']
+                            replacement_id = substitution_['replacement']['id']
+                            outcome_id = substitution_['outcome']['id']
+                            substitution.append(common + (replacement_id, team_id,
+                                season_id, outcome_id))
                         case 20:
                             own_goal_against.append(common)
                         case 21:

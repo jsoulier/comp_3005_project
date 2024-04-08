@@ -191,6 +191,8 @@ INSERT INTO definition VALUES (96, 'Blocked');
 INSERT INTO definition VALUES (97, 'Goal');
 INSERT INTO definition VALUES (98, 'Off Target');
 INSERT INTO definition VALUES (99, 'Post');
+INSERT INTO definition VALUES (102, 'Injury');
+INSERT INTO definition VALUES (103, 'Tactical');
 CREATE TABLE common (
     player_id INT,
     play_id INT,
@@ -267,10 +269,16 @@ CREATE TABLE shot (
     FOREIGN KEY (outcome_id) REFERENCES definition (definition_id)
 ) INHERITS (common);
 CREATE TABLE pressure (
+    counter_pressure BOOLEAN
 ) INHERITS (common);
 CREATE TABLE half_start (
+    late_video_start BOOLEAN
 ) INHERITS (common);
 CREATE TABLE substitution (
+    replacement_id INT,
+    outcome_id INT,
+    FOREIGN KEY (replacement_id) REFERENCES player (player_id),
+    FOREIGN KEY (outcome_id) REFERENCES definition (definition_id)
 ) INHERITS (common);
 CREATE TABLE own_goal_against (
 ) INHERITS (common);
@@ -431,28 +439,32 @@ VALUES ((
 ), %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
 '''
 pressure = '''
-INSERT INTO pressure (player_id, play_id, position_id, period, minute, second, possession, possession_id, x, y, duration, under_pressure) 
+INSERT INTO pressure (player_id, play_id, position_id, period, minute, second, possession, possession_id, x, y, duration, under_pressure, counter_pressure) 
 VALUES ((
     SELECT player_id 
     FROM player 
     WHERE person_id = %s AND team_id = %s AND season_id = %s 
-), %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+), %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
 '''
 half_start = '''
-INSERT INTO half_start (player_id, play_id, position_id, period, minute, second, possession, possession_id, x, y, duration, under_pressure) 
+INSERT INTO half_start (player_id, play_id, position_id, period, minute, second, possession, possession_id, x, y, duration, under_pressure, late_video_start) 
 VALUES ((
     SELECT player_id 
     FROM player 
     WHERE person_id = %s AND team_id = %s AND season_id = %s 
-), %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+), %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
 '''
 substitution = '''
-INSERT INTO substitution (player_id, play_id, position_id, period, minute, second, possession, possession_id, x, y, duration, under_pressure) 
+INSERT INTO substitution (player_id, play_id, position_id, period, minute, second, possession, possession_id, x, y, duration, under_pressure, replacement_id, outcome_id) 
 VALUES ((
     SELECT player_id 
     FROM player 
     WHERE person_id = %s AND team_id = %s AND season_id = %s 
-), %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+), %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, (
+    SELECT player_id 
+    FROM player 
+    WHERE person_id = %s AND team_id = %s AND season_id = %s 
+), %s)
 '''
 own_goal_against = '''
 INSERT INTO own_goal_against (player_id, play_id, position_id, period, minute, second, possession, possession_id, x, y, duration, under_pressure) 
