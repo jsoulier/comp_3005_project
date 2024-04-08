@@ -118,6 +118,8 @@ INSERT INTO definition VALUES (1, 'Lost');
 INSERT INTO definition VALUES (10, 'Aerial Lost');
 INSERT INTO definition VALUES (100, 'Saved');
 INSERT INTO definition VALUES (101, 'Wayward');
+INSERT INTO definition VALUES (102, 'Injury');
+INSERT INTO definition VALUES (103, 'Tactical');
 INSERT INTO definition VALUES (104, 'Inswinging');
 INSERT INTO definition VALUES (105, 'Outswinging');
 INSERT INTO definition VALUES (106, 'No Touch');
@@ -136,6 +138,12 @@ INSERT INTO definition VALUES (14, 'Lost Out');
 INSERT INTO definition VALUES (15, 'Success');
 INSERT INTO definition VALUES (16, 'Success In Play');
 INSERT INTO definition VALUES (17, 'Success Out');
+INSERT INTO definition VALUES (19, '6 Seconds');
+INSERT INTO definition VALUES (20, 'Backpass Pick');
+INSERT INTO definition VALUES (21, 'Dangerous Play');
+INSERT INTO definition VALUES (22, 'Dive');
+INSERT INTO definition VALUES (23, 'Foul Out');
+INSERT INTO definition VALUES (24, 'Handball');
 INSERT INTO definition VALUES (25, 'Collected');
 INSERT INTO definition VALUES (26, 'Goal Conceded');
 INSERT INTO definition VALUES (28, 'Penalty Conceded');
@@ -156,6 +164,7 @@ INSERT INTO definition VALUES (41, 'Right Hand');
 INSERT INTO definition VALUES (47, 'Claim');
 INSERT INTO definition VALUES (48, 'Clear');
 INSERT INTO definition VALUES (49, 'Collected Twice');
+INSERT INTO definition VALUES (5, 'Yellow Card');
 INSERT INTO definition VALUES (50, 'Fail');
 INSERT INTO definition VALUES (51, 'In Play');
 INSERT INTO definition VALUES (52, 'In Play Danger');
@@ -163,6 +172,7 @@ INSERT INTO definition VALUES (53, 'In Play Safe');
 INSERT INTO definition VALUES (55, 'No Touch');
 INSERT INTO definition VALUES (56, 'Saved Twice');
 INSERT INTO definition VALUES (58, 'Touched In');
+INSERT INTO definition VALUES (6, 'Second Yellow');
 INSERT INTO definition VALUES (61, 'Corner');
 INSERT INTO definition VALUES (62, 'Free Kick');
 INSERT INTO definition VALUES (63, 'Goal Kick');
@@ -171,6 +181,7 @@ INSERT INTO definition VALUES (65, 'Kick Off');
 INSERT INTO definition VALUES (66, 'Recovery');
 INSERT INTO definition VALUES (67, 'Throw In');
 INSERT INTO definition VALUES (68, 'Drop Kick');
+INSERT INTO definition VALUES (7, 'Red Card');
 INSERT INTO definition VALUES (70, 'Other');
 INSERT INTO definition VALUES (74, 'Injury Clearance');
 INSERT INTO definition VALUES (75, 'Out');
@@ -191,8 +202,6 @@ INSERT INTO definition VALUES (96, 'Blocked');
 INSERT INTO definition VALUES (97, 'Goal');
 INSERT INTO definition VALUES (98, 'Off Target');
 INSERT INTO definition VALUES (99, 'Post');
-INSERT INTO definition VALUES (102, 'Injury');
-INSERT INTO definition VALUES (103, 'Tactical');
 CREATE TABLE common (
     player_id INT,
     play_id INT,
@@ -283,8 +292,19 @@ CREATE TABLE substitution (
 CREATE TABLE own_goal_against (
 ) INHERITS (common);
 CREATE TABLE foul_won (
+    defensive BOOLEAN,
+    advantage BOOLEAN,
+    penalty BOOLEAN
 ) INHERITS (common);
 CREATE TABLE foul_committed (
+    counter_pressure BOOLEAN,
+    offensive BOOLEAN,
+    type_id INT,
+    advantage BOOLEAN,
+    penalty BOOLEAN,
+    card_id INT,
+    FOREIGN KEY (type_id) REFERENCES definition (definition_id),
+    FOREIGN KEY (card_id) REFERENCES definition (definition_id)
 ) INHERITS (common);
 CREATE TABLE goal_keeper (
 ) INHERITS (common);
@@ -475,20 +495,20 @@ VALUES ((
 ), %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
 '''
 foul_won = '''
-INSERT INTO foul_won (player_id, play_id, position_id, period, minute, second, possession, possession_id, x, y, duration, under_pressure) 
+INSERT INTO foul_won (player_id, play_id, position_id, period, minute, second, possession, possession_id, x, y, duration, under_pressure, defensive, advantage, penalty) 
 VALUES ((
     SELECT player_id 
     FROM player 
     WHERE person_id = %s AND team_id = %s AND season_id = %s 
-), %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+), %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
 '''
 foul_committed = '''
-INSERT INTO foul_committed (player_id, play_id, position_id, period, minute, second, possession, possession_id, x, y, duration, under_pressure) 
+INSERT INTO foul_committed (player_id, play_id, position_id, period, minute, second, possession, possession_id, x, y, duration, under_pressure, counter_pressure, offensive, type_id, advantage, penalty, card_id) 
 VALUES ((
     SELECT player_id 
     FROM player 
     WHERE person_id = %s AND team_id = %s AND season_id = %s 
-), %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+), %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
 '''
 goal_keeper = '''
 INSERT INTO goal_keeper (player_id, play_id, position_id, period, minute, second, possession, possession_id, x, y, duration, under_pressure) 

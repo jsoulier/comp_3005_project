@@ -228,9 +228,19 @@ def populate(cursor):
                         case 20:
                             own_goal_against.append(common)
                         case 21:
-                            foul_won.append(common)
+                            foul_won_ = item.get('foul_won', {})
+                            defensive = 'defensive' in foul_won_
+                            advantage = 'advantage' in foul_won_
+                            penalty = 'penalty' in foul_won_
+                            foul_won.append(common + (defensive, advantage, penalty))
                         case 22:
-                            foul_committed.append(common)
+                            foul_committed_ = item.get('foul_committed', {})
+                            offensive = 'offensive' in foul_committed_
+                            type_id = foul_committed_.get('type', {}).get('id')
+                            advantage = 'advantage' in foul_committed_
+                            penalty = 'penalty' in foul_committed_
+                            card_id = foul_committed_.get('card', {}).get('id')
+                            foul_committed.append(common + (counter_pressure, offensive, type_id, advantage, penalty, card_id))
                         case 23:
                             goal_keeper.append(common)
                         case 24:
