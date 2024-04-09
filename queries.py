@@ -202,12 +202,12 @@ def Q_1(cursor, conn, execution_time):
 
     query = """
     SELECT person.person_name, AVG(shot.xg) as xgs
-    FROM player
-    LEFT JOIN shot ON player.player_id = shot.player_id
-    JOIN season ON player.season_id = season.season_id
-    JOIN person ON player.person_id = person.person_id
+    FROM person
+    JOIN shot ON person.person_id = shot.person_id
+    JOIN match ON match.match_id = shot.match_id
+    JOIN season ON match.season_id = season.season_id
     WHERE shot.xg > 0 AND season.competition_name = 'La Liga' AND season.season_name = '2020/2021'
-    GROUP BY player.person_id, person.person_name
+    GROUP BY person.person_id, person.person_name
     ORDER BY xgs DESC;
     """
 
@@ -229,14 +229,14 @@ def Q_2(cursor, conn, execution_time):
     # Enter QUERY within the quotes:
 
     query = """
-    SELECT person.person_name, COUNT(shot.player_id) AS shots 
-    FROM player
-    JOIN shot ON player.player_id = shot.player_id
-    JOIN season ON player.season_id = season.season_id
-    JOIN person ON player.person_id = person.person_id
+    SELECT person.person_name, COUNT(shot.person_id) AS shots 
+    FROM person
+    JOIN shot ON person.person_id = shot.person_id
+    JOIN match ON match.match_id = shot.match_id
+    JOIN season ON match.season_id = season.season_id
     WHERE season.competition_name = 'La Liga' AND season.season_name = '2020/2021' 
-    GROUP BY player.person_id, person.person_name
-    HAVING COUNT(shot.player_id) > 0
+    GROUP BY person.person_id, person.person_name
+    HAVING COUNT(shot.person_id) > 0
     ORDER BY shots DESC;
     """
 
@@ -258,14 +258,14 @@ def Q_3(cursor, conn, execution_time):
     # Enter QUERY within the quotes:
     
     query = """
-    SELECT person.person_name, COUNT(shot.player_id) AS first_time_shots 
-    FROM player 
-    LEFT JOIN shot ON player.player_id = shot.player_id AND shot.first_time = TRUE 
-    JOIN season ON player.season_id = season.season_id 
-    JOIN person ON player.person_id = person.person_id 
+    SELECT person.person_name, COUNT(shot.person_id) AS first_time_shots 
+    FROM person 
+    JOIN shot ON person.person_id = shot.person_id AND shot.first_time = TRUE 
+    JOIN match ON match.match_id = shot.match_id
+    JOIN season ON match.season_id = season.season_id 
     WHERE season.competition_name = 'La Liga' AND season.season_name IN ('2018/2019', '2019/2020', '2020/2021') 
-    GROUP BY player.person_id, person.person_name 
-    HAVING COUNT(shot.player_id) > 0
+    GROUP BY person.person_id, person.person_name 
+    HAVING COUNT(shot.person_id) > 0
     ORDER BY first_time_shots DESC;
     """
 
@@ -287,10 +287,10 @@ def Q_4(cursor, conn, execution_time):
     
     query = """
     SELECT team.team_name, COUNT(*) AS passes 
-    FROM player 
-    JOIN pass ON player.player_id = pass.player_id 
-    JOIN team ON player.team_id = team.team_id 
-    JOIN season ON player.season_id = season.season_id 
+    FROM pass
+    JOIN team ON pass.team_id = team.team_id
+    JOIN match ON match.match_id = pass.match_id
+    JOIN season ON match.season_id = season.season_id 
     WHERE season.competition_name = 'La Liga' AND season.season_name = '2020/2021' 
     GROUP BY team.team_id, team.team_name 
     HAVING COUNT(*) > 0
@@ -314,14 +314,14 @@ def Q_5(cursor, conn, execution_time):
     # Enter QUERY within the quotes:
     
     query = """
-    SELECT person.person_name, COUNT(ball_receipt.player_id) AS ball_receipts 
-    FROM player 
-    JOIN ball_receipt ON player.player_id = ball_receipt.player_id 
-    JOIN season ON player.season_id = season.season_id 
-    JOIN person ON player.person_id = person.person_id 
+    SELECT person.person_name, COUNT(ball_receipt.person_id) AS ball_receipts 
+    FROM person 
+    JOIN ball_receipt ON person.person_id = ball_receipt.person_id 
+    JOIN match ON match.match_id = ball_receipt.match_id
+    JOIN season ON match.season_id = season.season_id 
     WHERE season.competition_name = 'Premier League' AND season.season_name = '2003/2004'  
-    GROUP BY player.person_id, person.person_name 
-    HAVING COUNT(ball_receipt.player_id) > 0
+    GROUP BY person.person_id, person.person_name 
+    HAVING COUNT(ball_receipt.person_id) > 0
     ORDER BY ball_receipts DESC;
     """
 
@@ -342,14 +342,14 @@ def Q_6(cursor, conn, execution_time):
     # Enter QUERY within the quotes:
     
     query = """
-    SELECT team.team_name, COUNT(shot.player_id) AS shots 
-    FROM player 
-    JOIN shot ON player.player_id = shot.player_id 
-    JOIN team ON player.team_id = team.team_id 
-    JOIN season ON player.season_id = season.season_id 
+    SELECT team.team_name, COUNT(shot.person_id) AS shots 
+    FROM shot
+    JOIN team ON shot.team_id = team.team_id
+    JOIN match ON match.match_id = shot.match_id
+    JOIN season ON match.season_id = season.season_id 
     WHERE season.competition_name = 'Premier League' AND season.season_name = '2003/2004' 
     GROUP BY team.team_id, team.team_name 
-    HAVING COUNT(shot.player_id) > 0
+    HAVING COUNT(shot.person_id) > 0
     ORDER BY shots DESC;
     """
 
@@ -370,14 +370,14 @@ def Q_7(cursor, conn, execution_time):
     # Enter QUERY within the quotes:
     
     query = """
-    SELECT person.person_name, COUNT(pass.player_id) AS through_balls 
-    FROM player 
-    JOIN pass ON player.player_id = pass.player_id AND pass.technique_id = 108
-    JOIN season ON player.season_id = season.season_id 
-    JOIN person ON player.person_id = person.person_id 
+    SELECT person.person_name, COUNT(pass.person_id) AS through_balls 
+    FROM person 
+    JOIN pass ON person.person_id = pass.person_id AND pass.technique_id = 108
+    JOIN match ON match.match_id = pass.match_id
+    JOIN season ON match.season_id = season.season_id 
     WHERE season.competition_name = 'La Liga' AND season.season_name = '2020/2021' 
-    GROUP BY player.person_id, person.person_name 
-    HAVING COUNT(pass.player_id) > 0
+    GROUP BY person.person_id, person.person_name 
+    HAVING COUNT(pass.person_id) > 0
     ORDER BY through_balls DESC;
     """
 
@@ -398,14 +398,14 @@ def Q_8(cursor, conn, execution_time):
     # Enter QUERY within the quotes:
     
     query = """
-    SELECT team.team_name, COUNT(pass.player_id) AS through_balls 
-    FROM player 
-    JOIN pass ON player.player_id = pass.player_id AND pass.technique_id = 108
-    JOIN team ON player.team_id = team.team_id 
-    JOIN season ON player.season_id = season.season_id 
+    SELECT team.team_name, COUNT(pass.person_id) AS through_balls 
+    FROM team
+    JOIN pass ON team.team_id = pass.team_id AND pass.technique_id = 108
+    JOIN match ON match.match_id = pass.match_id
+    JOIN season ON match.season_id = season.season_id 
     WHERE season.competition_name = 'La Liga' AND season.season_name = '2020/2021' 
     GROUP BY team.team_id, team.team_name 
-    HAVING COUNT(pass.player_id) > 0
+    HAVING COUNT(pass.person_id) > 0
     ORDER BY through_balls DESC;
     """
 
@@ -426,14 +426,14 @@ def Q_9(cursor, conn, execution_time):
     # Enter QUERY within the quotes:
     
     query = """
-    SELECT person.person_name, COUNT(dribble.player_id) AS completed_dribbles 
-    FROM player 
-    JOIN dribble ON player.player_id = dribble.player_id AND dribble.outcome_id = 8
-    JOIN season ON player.season_id = season.season_id 
-    JOIN person ON player.person_id = person.person_id 
+    SELECT person.person_name, COUNT(dribble.person_id) AS completed_dribbles 
+    FROM person 
+    JOIN dribble ON person.person_id = dribble.person_id AND dribble.outcome_id = 8
+    JOIN match ON match.match_id = dribble.match_id
+    JOIN season ON match.season_id = season.season_id 
     WHERE season.competition_name = 'La Liga' AND season.season_name IN ('2018/2019', '2019/2020', '2020/2021') 
-    GROUP BY player.person_id, person.person_name 
-    HAVING COUNT(dribble.player_id) > 0
+    GROUP BY person.person_id, person.person_name 
+    HAVING COUNT(dribble.person_id) > 0
     ORDER BY completed_dribbles DESC;
     """
 
@@ -452,16 +452,16 @@ def Q_10(cursor, conn, execution_time):
 
     #==========================================================================    
     # Enter QUERY within the quotes:
-    
+
     query = """
-    SELECT person.person_name, COUNT(dribbled_past.player_id) AS dribbled_pasts 
-    FROM player 
-    JOIN dribbled_past ON player.player_id = dribbled_past.player_id 
-    JOIN season ON player.season_id = season.season_id 
-    JOIN person ON player.person_id = person.person_id 
+    SELECT person.person_name, COUNT(dribbled_past.person_id) AS dribbled_pasts 
+    FROM person 
+    JOIN dribbled_past ON person.person_id = dribbled_past.person_id 
+    JOIN match ON match.match_id = dribbled_past.match_id
+    JOIN season ON match.season_id = season.season_id 
     WHERE season.competition_name = 'La Liga' AND season.season_name = '2020/2021' 
-    GROUP BY player.person_id, person.person_name 
-    HAVING COUNT(dribbled_past.player_id) > 0
+    GROUP BY person.person_id, person.person_name 
+    HAVING COUNT(dribbled_past.person_id) > 0
     ORDER BY dribbled_pasts;
     """
 
