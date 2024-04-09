@@ -42,6 +42,7 @@ DROP TABLE IF EXISTS season;
 DROP TABLE IF EXISTS play;
 DROP TABLE IF EXISTS position;
 DROP TABLE IF EXISTS definition;
+DROP TABLE IF EXISTS height;
 '''
 create = '''
 CREATE TABLE season (
@@ -161,6 +162,11 @@ INSERT INTO definition VALUES (39, 'Left Hand');
 INSERT INTO definition VALUES (4, 'Won');
 INSERT INTO definition VALUES (40, 'Right Foot');
 INSERT INTO definition VALUES (41, 'Right Hand');
+INSERT INTO definition VALUES (42, 'Moving');
+INSERT INTO definition VALUES (43, 'Prone');
+INSERT INTO definition VALUES (44, 'Set');
+INSERT INTO definition VALUES (45, 'Diving');
+INSERT INTO definition VALUES (46, 'Standing');
 INSERT INTO definition VALUES (47, 'Claim');
 INSERT INTO definition VALUES (48, 'Clear');
 INSERT INTO definition VALUES (49, 'Collected Twice');
@@ -181,6 +187,7 @@ INSERT INTO definition VALUES (65, 'Kick Off');
 INSERT INTO definition VALUES (66, 'Recovery');
 INSERT INTO definition VALUES (67, 'Throw In');
 INSERT INTO definition VALUES (68, 'Drop Kick');
+INSERT INTO definition VALUES (69, 'Keeper Arm');
 INSERT INTO definition VALUES (7, 'Red Card');
 INSERT INTO definition VALUES (70, 'Other');
 INSERT INTO definition VALUES (74, 'Injury Clearance');
@@ -202,6 +209,13 @@ INSERT INTO definition VALUES (96, 'Blocked');
 INSERT INTO definition VALUES (97, 'Goal');
 INSERT INTO definition VALUES (98, 'Off Target');
 INSERT INTO definition VALUES (99, 'Post');
+CREATE TABLE height (
+    height_id INT PRIMARY KEY,
+    height_name VARCHAR(128)
+);
+INSERT INTO height VALUES (1, 'Ground Pass');
+INSERT INTO height VALUES (2, 'Low Pass');
+INSERT INTO height VALUES (3, 'High Pass');
 CREATE TABLE common (
     player_id INT,
     play_id INT,
@@ -307,8 +321,20 @@ CREATE TABLE foul_committed (
     FOREIGN KEY (card_id) REFERENCES definition (definition_id)
 ) INHERITS (common);
 CREATE TABLE goal_keeper (
+    stance_id INT,
+    technique_id INT,
+    body_part_id INT,
+    type_id INT,
+    outcome_id INT,
+    FOREIGN KEY (stance_id) REFERENCES definition (definition_id),
+    FOREIGN KEY (technique_id) REFERENCES definition (definition_id),
+    FOREIGN KEY (body_part_id) REFERENCES definition (definition_id),
+    FOREIGN KEY (type_id) REFERENCES definition (definition_id),
+    FOREIGN KEY (outcome_id) REFERENCES definition (definition_id)
 ) INHERITS (common);
 CREATE TABLE bad_behaviour (
+    card_id INT,
+    FOREIGN KEY (card_id) REFERENCES definition (definition_id)
 ) INHERITS (common);
 CREATE TABLE own_goal_for (
     team_id INT,
@@ -317,11 +343,35 @@ CREATE TABLE own_goal_for (
 CREATE TABLE player_on (
 ) INHERITS (common);
 CREATE TABLE player_off (
+    permanent BOOLEAN
 ) INHERITS (common);
 CREATE TABLE shield (
 ) INHERITS (common);
 CREATE TABLE pass (
-    through_ball BOOLEAN
+    recipient_id INT,
+    length FLOAT,
+    angle FLOAT,
+    height_id INT,
+    end_x FLOAT,
+    end_y FLOAT,
+    backheel BOOLEAN,
+    deflected BOOLEAN,
+    miscommunication BOOLEAN,
+    cross_ BOOLEAN,
+    cut_back BOOLEAN,
+    switch BOOLEAN,
+    shot_assist BOOLEAN,
+    goal_assist BOOLEAN,
+    body_part_id INT,
+    type_id INT,
+    outcome_id INT,
+    technique_id INT,
+    FOREIGN KEY (recipient_id) REFERENCES player (player_id),
+    FOREIGN KEY (height_id) REFERENCES height (height_id),
+    FOREIGN KEY (body_part_id) REFERENCES definition (definition_id),
+    FOREIGN KEY (type_id) REFERENCES definition (definition_id),
+    FOREIGN KEY (outcome_id) REFERENCES definition (definition_id),
+    FOREIGN KEY (technique_id) REFERENCES definition (definition_id)
 ) INHERITS (common);
 CREATE TABLE fifty_fifty (
 ) INHERITS (common);
@@ -511,20 +561,20 @@ VALUES ((
 ), %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
 '''
 goal_keeper = '''
-INSERT INTO goal_keeper (player_id, play_id, position_id, period, minute, second, possession, possession_id, x, y, duration, under_pressure) 
+INSERT INTO goal_keeper (player_id, play_id, position_id, period, minute, second, possession, possession_id, x, y, duration, under_pressure, stance_id, technique_id, body_part_id, type_id, outcome_id) 
 VALUES ((
     SELECT player_id 
     FROM player 
     WHERE person_id = %s AND team_id = %s AND season_id = %s 
-), %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+), %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
 '''
 bad_behaviour = '''
-INSERT INTO bad_behaviour (player_id, play_id, position_id, period, minute, second, possession, possession_id, x, y, duration, under_pressure) 
+INSERT INTO bad_behaviour (player_id, play_id, position_id, period, minute, second, possession, possession_id, x, y, duration, under_pressure, card_id) 
 VALUES ((
     SELECT player_id 
     FROM player 
     WHERE person_id = %s AND team_id = %s AND season_id = %s 
-), %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+), %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
 '''
 own_goal_for = '''
 INSERT INTO own_goal_for (player_id, play_id, position_id, period, minute, second, possession, possession_id, x, y, duration, under_pressure, team_id) 
@@ -543,12 +593,12 @@ VALUES ((
 ), %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
 '''
 player_off = '''
-INSERT INTO player_off (player_id, play_id, position_id, period, minute, second, possession, possession_id, x, y, duration, under_pressure) 
+INSERT INTO player_off (player_id, play_id, position_id, period, minute, second, possession, possession_id, x, y, duration, under_pressure, permanent) 
 VALUES ((
     SELECT player_id 
     FROM player 
     WHERE person_id = %s AND team_id = %s AND season_id = %s 
-), %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+), %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
 '''
 shield = '''
 INSERT INTO shield (player_id, play_id, position_id, period, minute, second, possession, possession_id, x, y, duration, under_pressure) 
@@ -559,12 +609,16 @@ VALUES ((
 ), %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
 '''
 pass_ = '''
-INSERT INTO pass (player_id, play_id, position_id, period, minute, second, possession, possession_id, x, y, duration, under_pressure, through_ball) 
+INSERT INTO pass (player_id, play_id, position_id, period, minute, second, possession, possession_id, x, y, duration, under_pressure, recipient_id, length, angle, height_id, end_x, end_y, backheel, deflected, miscommunication, cross_, cut_back, switch, shot_assist, goal_assist, body_part_id, type_id, outcome_id, technique_id)
 VALUES ((
     SELECT player_id 
     FROM player 
     WHERE person_id = %s AND team_id = %s AND season_id = %s 
-), %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+), %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, (
+    SELECT player_id 
+    FROM player 
+    WHERE person_id = %s AND team_id = %s AND season_id = %s 
+), %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
 '''
 fifty_fifty = '''
 INSERT INTO fifty_fifty (player_id, play_id, position_id, period, minute, second, possession, possession_id, x, y, duration, under_pressure) 

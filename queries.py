@@ -372,7 +372,7 @@ def Q_7(cursor, conn, execution_time):
     query = """
     SELECT person.person_name, COUNT(pass.player_id) AS through_balls 
     FROM player 
-    JOIN pass ON player.player_id = pass.player_id AND pass.through_ball = TRUE 
+    JOIN pass ON player.player_id = pass.player_id AND pass.technique_id = 108
     JOIN season ON player.season_id = season.season_id 
     JOIN person ON player.person_id = person.person_id 
     WHERE season.competition_name = 'La Liga' AND season.season_name = '2020/2021' 
@@ -400,7 +400,7 @@ def Q_8(cursor, conn, execution_time):
     query = """
     SELECT team.team_name, COUNT(pass.player_id) AS through_balls 
     FROM player 
-    JOIN pass ON player.player_id = pass.player_id AND pass.through_ball = TRUE 
+    JOIN pass ON player.player_id = pass.player_id AND pass.technique_id = 108
     JOIN team ON player.team_id = team.team_id 
     JOIN season ON player.season_id = season.season_id 
     WHERE season.competition_name = 'La Liga' AND season.season_name = '2020/2021' 

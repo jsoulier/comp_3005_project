@@ -242,21 +242,51 @@ def populate(cursor):
                             card_id = foul_committed_.get('card', {}).get('id')
                             foul_committed.append(common + (counter_pressure, offensive, type_id, advantage, penalty, card_id))
                         case 23:
-                            goal_keeper.append(common)
+                            goal_keeper_ = item.get('goal_keeper', {})
+                            stance_id = goal_keeper_.get('stance', {}).get('id')
+                            technique_id = goal_keeper_.get('technique', {}).get('id')
+                            body_part_id = goal_keeper_.get('body_part', {}).get('id')
+                            type_id = goal_keeper_.get('type', {}).get('id')
+                            outcome_id = goal_keeper_.get('outcome', {}).get('id')
+                            goal_keeper.append(common + (stance_id, technique_id, body_part_id, type_id, outcome_id))
                         case 24:
-                            bad_behaviour.append(common)
+                            bad_behaviour_ = item.get('bad_behaviour', {})
+                            card_id = bad_behaviour_.get('card', {}).get('id')
+                            bad_behaviour.append(common + (card_id, ))
                         case 25:
                             own_goal_for.append(common + (team_id, ))
                         case 26:
                             player_on.append(common)
                         case 27:
-                            player_off.append(common)
+                            player_off_ = item.get('player_off', {})
+                            permanent = 'permanent' in player_off_
+                            player_off.append(common + (permanent, ))
                         case 28:
                             shield.append(common)
                         case 30:
                             pass__ = item['pass']
-                            through_ball = 'through_ball' in pass__
-                            pass_.append(common + (through_ball, ))
+                            recipient_id = pass__.get('recipient', {}).get('id')
+                            length = pass__['length']
+                            angle = pass__['angle']
+                            height_id = pass__['height']['id']
+                            end_x = pass__['end_location'][0]
+                            end_y = pass__['end_location'][1]
+                            backheel = 'backheel' in pass__
+                            deflected = 'deflected' in pass__
+                            miscommunication = 'miscommunication' in pass__
+                            cross = 'cross' in pass__
+                            cut_back = 'cut_back' in pass__
+                            switch = 'switch' in pass__
+                            shot_assist = 'shot_assist' in pass__
+                            goal_assist = 'goal_assist' in pass__
+                            body_part_id = pass__.get('body_part', {}).get('id')
+                            type_id = pass__.get('type', {}).get('id')
+                            outcome_id = pass__.get('outcome', {}).get('id')
+                            technique_id = pass__.get('technique', {}).get('id')
+                            pass_.append(common + (recipient_id, team_id, season_id,
+                                length, angle, height_id, end_x, end_y, backheel, deflected,
+                                miscommunication, cross, cut_back, switch, shot_assist,
+                                goal_assist, body_part_id, type_id, outcome_id, technique_id))
                         case 33:
                             fifty_fifty.append(common)
                         case 34:
