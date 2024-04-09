@@ -13,8 +13,12 @@ username = 'postgres'
 password = '1234'
 host = 'localhost'
 port = '5432'
-seasons = [('La Liga', '2020/2021'), ('La Liga', '2019/2020'),
-    ('La Liga','2018/2019'), ('Premier League', '2003/2004')]
+seasons = [
+    ('La Liga', '2020/2021'),
+    ('La Liga', '2019/2020'),
+    ('La Liga', '2018/2019'),
+    ('Premier League', '2003/2004')
+]
 
 @contextlib.contextmanager
 def cd(path):
@@ -28,11 +32,27 @@ def cd(path):
 def download():
     if os.path.exists('json'):
         return
-    subprocess.run(['git', 'clone', '-n', '--filter=tree:0', repository, 'json'])
+    subprocess.run([
+        'git',
+        'clone',
+        '-n',
+        '--filter=tree:0',
+        repository,
+        'json'
+    ])
     with cd('json'):
-        subprocess.run(['git', 'sparse-checkout', 'set', '--no-cone',
-            '/data/competitions.json'])
-        subprocess.run(['git', 'checkout', commit])
+        subprocess.run([
+            'git',
+            'sparse-checkout',
+            'set',
+            '--no-cone',
+            '/data/competitions.json'
+        ])
+        subprocess.run([
+            'git',
+            'checkout',
+            commit
+        ])
         matches = []
         events = []
         lineups = []
@@ -45,28 +65,48 @@ def download():
             season = (competition_name, season_name)
             if season not in seasons:
                 continue
-            competition_id = str(item['competition_id'])
-            season_id = str(item['season_id'])
-            matches.append('data/matches/' + competition_id + '/' + season_id +
-                '.json')
-        subprocess.run(['git', 'sparse-checkout', 'add', '--no-cone'] +
-            ['/' + path for path in matches])
+            competition_id = item['competition_id']
+            season_id = item['season_id']
+            matches.append(
+                'data/matches/' +
+                str(competition_id) +
+                '/' +
+                str(season_id) +
+                '.json'
+            )
+        subprocess.run([
+            'git',
+            'sparse-checkout',
+            'add',
+            '--no-cone'
+        ] + ['/' + path for path in matches])
         for path in matches:
             path = os.path.normpath(path)
             with open(path, 'r', encoding='utf-8') as file:
                 data = json.load(file)
             for item in data:
-                match_id = str(item['match_id'])
-                events.append('/data/events/' + match_id + '.json')
-                lineups.append('/data/lineups/' + match_id + '.json')
-        subprocess.run(['git', 'sparse-checkout', 'add', '--no-cone'] + events +
-            lineups)
+                match_id = item['match_id']
+                events.append(
+                    '/data/events/' +
+                    str(match_id) +
+                    '.json'
+                )
+                lineups.append(
+                    '/data/lineups/' +
+                    str(match_id) +
+                    '.json'
+                )
+        subprocess.run([
+            'git',
+            'sparse-checkout',
+            'add',
+            '--no-cone'
+        ] + events + lineups)
 
 def populate(cursor):
     person = []
     country = []
     team = []
-    player = []
     ball_recovery = []
     dispossessed = []
     duel = []
@@ -102,23 +142,53 @@ def populate(cursor):
     ball_receipt = []
     carry = []
     freeze_frame = []
-    formation = []
+    stadium = []
+    match_ = []
     shot_id = 0
-    starting_xi_id = 0
     with cd('json'):
         matches = glob.glob(os.path.join('data', 'matches', '**', '*.json'))
         for path in matches:
             with open(path, 'r', encoding='utf-8') as file:
                 data = json.load(file)
             for item in data:
-                match_id = str(item['match_id'])
+                match_id = item['match_id']
+                match_date = item['match_date']
+                kick_off = item['kick_off']
                 home_team_id = item['home_team']['home_team_id']
                 away_team_id = item['away_team']['away_team_id']
+                home_team_gender = item['home_team']['home_team_gender']
+                away_team_gender = item['away_team']['away_team_gender']
+                home_score = item['home_score']
+                away_score = item['away_score']
+                match_week = item['match_week']
+                competition_stage = item['competition_stage']['name']
+                country_name  = item['competition']['country_name']
                 competition_name = item['competition']['competition_name']
                 season_name = item['season']['season_name']
+                stadium_id = item.get('stadium', {}).get('id')
+                stadium_name = item.get('stadium', {}).get('name')
+                country_id = item.get('stadium', {}).get('country', {}).get('id')
                 cursor.execute(sql.season, (competition_name, season_name))
                 season_id = cursor.fetchone()[0]
-                path = 'data/lineups/' + match_id + '.json'
+                if stadium_id and stadium_name:
+                    stadium.append((stadium_id, stadium_name, country_id))
+                match_.append((
+                    match_id,
+                    match_date,
+                    kick_off,
+                    country_name,
+                    season_id,
+                    home_team_id,
+                    away_team_id,
+                    home_team_gender,
+                    away_team_gender,
+                    home_score,
+                    away_score,
+                    match_week,
+                    competition_stage,
+                    stadium_id
+                ))
+                path = 'data/lineups/' + str(match_id) + '.json'
                 with open(path, 'r', encoding='utf-8') as file:
                     data = json.load(file)
                 for item in data:
@@ -133,9 +203,13 @@ def populate(cursor):
                         country_id = lineup['country']['id']
                         country_name = lineup['country']['name']
                         country.append((country_id, country_name))
-                        player.append((person_id, team_id, season_id, jersey_number))
-                        person.append((person_id, person_name, person_nickname, country_id))
-                path = 'data/events/' + match_id + '.json'
+                        person.append((
+                            person_id,
+                            person_name,
+                            person_nickname,
+                            country_id
+                        ))
+                path = 'data/events/' + str(match_id) + '.json'
                 with open(path, 'r', encoding='utf-8') as file:
                     data = json.load(file)
                 for item in data:
@@ -154,23 +228,41 @@ def populate(cursor):
                     under_pressure = 'under_pressure' in item
                     counter_pressure = 'counterpress' in item
                     off_camera = 'off_camera' in item
-                    common = (person_id, team_id, season_id, play_id, position_id,
-                        period, minute, second, possession, possession_id, x, y,
-                        duration, under_pressure)
+                    common = (
+                        match_id,
+                        person_id,
+                        play_id,
+                        position_id,
+                        period,
+                        minute,
+                        second,
+                        possession,
+                        possession_id,
+                        x,
+                        y,
+                        duration,
+                        under_pressure
+                    )
                     match type_id:
                         case 2:
                             ball_recovery_ = item.get('ball_recovery', {})
                             offensive = 'offensive' in ball_recovery_
                             recovery_failure = 'recovery_failure' in ball_recovery_
-                            ball_recovery.append(common + (offensive, recovery_failure))
+                            ball_recovery.append(common + (
+                                offensive,
+                                recovery_failure
+                            ))
                         case 3:
                             dispossessed.append(common)
                         case 4:
                             duel_ = item['duel']
                             duel_type_id = duel_['type']['id']
                             duel_outcome_id = duel_.get('outcome', {}).get('id')
-                            duel.append(common + (counter_pressure, duel_type_id,
-                                duel_outcome_id))
+                            duel.append(common + (
+                                counter_pressure,
+                                duel_type_id,
+                                duel_outcome_id
+                            ))
                         case 5:
                             camera_on.append(common)
                         case 6:
@@ -178,15 +270,22 @@ def populate(cursor):
                             deflection = 'deflection' in block_
                             offensive = 'offensive' in block_
                             save_block = 'save_block' in block_
-                            block.append(common + (counter_pressure, deflection,
-                                offensive, save_block))
+                            block.append(common + (
+                                counter_pressure,
+                                deflection,
+                                offensive,
+                                save_block
+                            ))
                         case 8:
                             offside.append(common)
                         case 9:
                             clearance_ = item.get('clearance')
                             aerial_won = 'aerial_won' in clearance_
                             body_part_id = clearance_['body_part']['id']
-                            clearance.append(common + (aerial_won, body_part_id))
+                            clearance.append(common + (
+                                aerial_won,
+                                body_part_id
+                            ))
                         case 10:
                             interception.append(common)
                         case 14:
@@ -195,8 +294,12 @@ def populate(cursor):
                             nutmeg = 'nutmeg' in dribble_
                             no_touch = 'no_touch' in dribble_
                             outcome_id = dribble_['outcome']['id']
-                            dribble.append(common + (overrun, nutmeg, no_touch,
-                                outcome_id))
+                            dribble.append(common + (
+                                overrun,
+                                nutmeg,
+                                no_touch,
+                                outcome_id
+                            ))
                         case 16:
                             shot_ = item['shot']
                             xg = shot_['statsbomb_xg']
@@ -213,21 +316,34 @@ def populate(cursor):
                             body_part_id = shot_['body_part']['id']
                             type_id = shot_['type']['id']
                             outcome_id = shot_['outcome']['id']
-                            shot.append(common + (shot_id, xg, first_time, end_x,
-                                end_y, end_z, aerial_won, follows_dribble, open_goal,
-                                deflected, technique_id, body_part_id, type_id,
-                                outcome_id))
+                            shot.append(common + (
+                                shot_id,
+                                xg,
+                                first_time,
+                                end_x,
+                                end_y,
+                                end_z,
+                                aerial_won,
+                                follows_dribble,
+                                open_goal,
+                                deflected,
+                                technique_id,
+                                body_part_id,
+                                type_id,
+                                outcome_id
+                            ))
                             for frame in shot_.get('freeze_frame', []):
                                 x_ = frame['location'][0]
                                 y_ = frame['location'][1]
                                 person_id = frame['player']['id']
                                 position_id = frame['position']['id']
-                                teammate = frame['teammate']
-                                opposing_team_id = (home_team_id if team_id ==
-                                    away_team_id else away_team_id)
-                                this_team_id = team_id if teammate else opposing_team_id
-                                freeze_frame.append((person_id, this_team_id, season_id,
-                                    shot_id, x_, y_, position_id))
+                                freeze_frame.append((
+                                    shot_id,
+                                    person_id,
+                                    x_,
+                                    y_,
+                                    position_id
+                                ))
                             shot_id += 1
                         case 17:
                             pressure.append(common + (counter_pressure, ))
@@ -239,8 +355,10 @@ def populate(cursor):
                             substitution_ = item['substitution']
                             replacement_id = substitution_['replacement']['id']
                             outcome_id = substitution_['outcome']['id']
-                            substitution.append(common + (replacement_id, team_id,
-                                season_id, outcome_id))
+                            substitution.append(common + (
+                                replacement_id,
+                                outcome_id
+                            ))
                         case 20:
                             own_goal_against.append(common)
                         case 21:
@@ -248,7 +366,11 @@ def populate(cursor):
                             defensive = 'defensive' in foul_won_
                             advantage = 'advantage' in foul_won_
                             penalty = 'penalty' in foul_won_
-                            foul_won.append(common + (defensive, advantage, penalty))
+                            foul_won.append(common + (
+                                defensive,
+                                advantage,
+                                penalty
+                            ))
                         case 22:
                             foul_committed_ = item.get('foul_committed', {})
                             offensive = 'offensive' in foul_committed_
@@ -256,8 +378,14 @@ def populate(cursor):
                             advantage = 'advantage' in foul_committed_
                             penalty = 'penalty' in foul_committed_
                             card_id = foul_committed_.get('card', {}).get('id')
-                            foul_committed.append(common + (counter_pressure, offensive,
-                                type_id, advantage, penalty, card_id))
+                            foul_committed.append(common + (
+                                counter_pressure,
+                                offensive,
+                                type_id,
+                                advantage,
+                                penalty,
+                                card_id
+                            ))
                         case 23:
                             goal_keeper_ = item.get('goal_keeper', {})
                             stance_id = goal_keeper_.get('stance', {}).get('id')
@@ -265,8 +393,13 @@ def populate(cursor):
                             body_part_id = goal_keeper_.get('body_part', {}).get('id')
                             type_id = goal_keeper_.get('type', {}).get('id')
                             outcome_id = goal_keeper_.get('outcome', {}).get('id')
-                            goal_keeper.append(common + (stance_id, technique_id,
-                                body_part_id, type_id, outcome_id))
+                            goal_keeper.append(common + (
+                                stance_id,
+                                technique_id,
+                                body_part_id,
+                                type_id,
+                                outcome_id
+                            ))
                         case 24:
                             bad_behaviour_ = item.get('bad_behaviour', {})
                             card_id = bad_behaviour_.get('card', {}).get('id')
@@ -301,29 +434,54 @@ def populate(cursor):
                             type_id = pass__.get('type', {}).get('id')
                             outcome_id = pass__.get('outcome', {}).get('id')
                             technique_id = pass__.get('technique', {}).get('id')
-                            pass_.append(common + (recipient_id, team_id, season_id,
-                                length, angle, height_id, end_x, end_y, backheel,
-                                deflected, miscommunication, cross, cut_back, switch,
-                                shot_assist, goal_assist, body_part_id, type_id,
-                                outcome_id, technique_id, off_camera))
+                            pass_.append(common + (
+                                recipient_id,
+                                length,
+                                angle,
+                                height_id,
+                                end_x,
+                                end_y,
+                                backheel,
+                                deflected,
+                                miscommunication,
+                                cross,
+                                cut_back,
+                                switch,
+                                shot_assist,
+                                goal_assist,
+                                body_part_id,
+                                type_id,
+                                outcome_id,
+                                technique_id,
+                                off_camera
+                            ))
                         case 33:
                             fifty_fifty_ = item['50_50']
                             outcome_id = fifty_fifty_['outcome']['id']
-                            fifty_fifty.append(common + (outcome_id, counter_pressure))
+                            fifty_fifty.append(common + (
+                                outcome_id,
+                                counter_pressure
+                            ))
                         case 34:
                             half_end_ = item.get('half_end', {})
                             early_video_start = 'early_video_start' in half_end_
                             match_suspended = 'match_suspended' in half_end_
-                            half_end.append(common + (early_video_start, match_suspended))
+                            half_end.append(common + (
+                                early_video_start,
+                                match_suspended
+                            ))
                         case 35:
                             tactics_ = item['tactics']
-                            starting_xi.append((team_id, season_id, starting_xi_id))
                             for lineup in tactics_['lineup']:
-                                player_id = lineup['player']['id']
+                                person_id = lineup['player']['id']
                                 position_id = lineup['position']['id']
                                 jersey_number = lineup['jersey_number']
-                                formation.append((player_id, team_id, season_id, position_id, jersey_number, starting_xi_id))
-                            starting_xi_id += 1
+                                starting_xi.append((
+                                    match_id,
+                                    person_id,
+                                    position_id,
+                                    jersey_number
+                                ))
                         case 36:
                             tactical_shift.append(common)
                         case 37:
@@ -348,11 +506,15 @@ def populate(cursor):
                             carry_ = item['carry']
                             end_x = carry_['end_location'][0]
                             end_y = carry_['end_location'][1]
-                            carry.append(common + (end_x, end_y))
+                            carry.append(common + (
+                                end_x,
+                                end_y
+                            ))
     cursor.executemany(sql.country, country)
-    cursor.executemany(sql.person, person)
+    cursor.executemany(sql.stadium, stadium)
     cursor.executemany(sql.team, team)
-    cursor.executemany(sql.player, player)
+    cursor.executemany(sql.match_, match_)
+    cursor.executemany(sql.person, person)
     cursor.executemany(sql.ball_recovery, ball_recovery)
     cursor.executemany(sql.dispossessed, dispossessed)
     cursor.executemany(sql.duel, duel)
@@ -388,7 +550,6 @@ def populate(cursor):
     cursor.executemany(sql.ball_receipt, ball_receipt)
     cursor.executemany(sql.carry, carry)
     cursor.executemany(sql.freeze_frame, freeze_frame)
-    cursor.executemany(sql.formation, formation)
 
 def export():
     os.environ['PGPASSWORD'] = password
@@ -406,8 +567,13 @@ def export():
 
 def main():
     os.chdir(os.path.dirname(os.path.realpath(__file__)))
-    connection = psycopg.connect(dbname=name, user=username, password=password,
-        host=host, port=port)
+    connection = psycopg.connect(
+        dbname=name,
+        user=username,
+        password=password,
+        host=host,
+        port=port
+    )
     cursor = connection.cursor()
     download()
     cursor.execute(sql.drop)
