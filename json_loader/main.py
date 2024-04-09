@@ -64,6 +64,7 @@ def download():
 
 def populate(cursor):
     person = []
+    country = []
     team = []
     player = []
     ball_recovery = []
@@ -124,11 +125,16 @@ def populate(cursor):
                     team_id = item['team_id']
                     team_name = item['team_name']
                     team.append((team_id, team_name))
-                    for player_ in item['lineup']:
-                        person_name = player_['player_name']
-                        person_id = player_['player_id']
-                        player.append((person_id, team_id, season_id))
-                        person.append((person_id, person_name))
+                    for lineup in item['lineup']:
+                        person_name = lineup['player_name']
+                        person_id = lineup['player_id']
+                        person_nickname = lineup['player_nickname']
+                        jersey_number = lineup['jersey_number']
+                        country_id = lineup['country']['id']
+                        country_name = lineup['country']['name']
+                        country.append((country_id, country_name))
+                        player.append((person_id, team_id, season_id, jersey_number))
+                        person.append((person_id, person_name, person_nickname, country_id))
                 path = 'data/events/' + match_id + '.json'
                 with open(path, 'r', encoding='utf-8') as file:
                     data = json.load(file)
@@ -343,6 +349,7 @@ def populate(cursor):
                             end_x = carry_['end_location'][0]
                             end_y = carry_['end_location'][1]
                             carry.append(common + (end_x, end_y))
+    cursor.executemany(sql.country, country)
     cursor.executemany(sql.person, person)
     cursor.executemany(sql.team, team)
     cursor.executemany(sql.player, player)
