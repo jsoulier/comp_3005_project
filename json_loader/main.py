@@ -147,6 +147,7 @@ def populate(cursor):
                     duration = item.get('duration', 0)
                     under_pressure = 'under_pressure' in item
                     counter_pressure = 'counterpress' in item
+                    off_camera = 'off_camera' in item
                     common = (person_id, team_id, season_id, play_id, position_id,
                         period, minute, second, possession, possession_id, x, y,
                         duration, under_pressure)
@@ -298,7 +299,7 @@ def populate(cursor):
                                 length, angle, height_id, end_x, end_y, backheel,
                                 deflected, miscommunication, cross, cut_back, switch,
                                 shot_assist, goal_assist, body_part_id, type_id,
-                                outcome_id, technique_id))
+                                outcome_id, technique_id, off_camera))
                         case 33:
                             fifty_fifty_ = item['50_50']
                             outcome_id = fifty_fifty_['outcome']['id']
@@ -322,17 +323,26 @@ def populate(cursor):
                         case 37:
                             error.append(common)
                         case 38:
-                            miscontrol.append(common)
+                            miscontrol_ = item.get('miscontrol', {})
+                            aerial_won = 'aerial_won' in miscontrol_
+                            miscontrol.append(common + (aerial_won, ))
                         case 39:
-                            dribbled_past.append(common)
+                            dribbled_past.append(common + (counter_pressure, ))
                         case 40:
-                            injury_stoppage.append(common)
+                            injury_stoppage_ = item.get('injury_stoppage', {})
+                            in_chain = 'in_chain' in injury_stoppage_
+                            injury_stoppage.append(common + (in_chain, ))
                         case 41:
-                            referee_ball_drop.append(common)
+                            referee_ball_drop.append(common + (off_camera, ))
                         case 42:
-                            ball_receipt.append(common)
+                            ball_receipt_ = item.get('ball_receipt', {})
+                            outcome_id = ball_receipt_.get('outcome', {}).get('id')
+                            ball_receipt.append(common + (outcome_id, ))
                         case 43:
-                            carry.append(common)
+                            carry_ = item['carry']
+                            end_x = carry_['end_location'][0]
+                            end_y = carry_['end_location'][1]
+                            carry.append(common + (end_x, end_y))
     cursor.executemany(sql.person, person)
     cursor.executemany(sql.team, team)
     cursor.executemany(sql.player, player)
