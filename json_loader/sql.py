@@ -36,8 +36,9 @@ DROP TABLE IF EXISTS ball_receipt;
 DROP TABLE IF EXISTS carry;
 DROP TABLE IF EXISTS card;
 DROP TABLE IF EXISTS lineup;
-DROP TABLE IF EXISTS manager;
 DROP TABLE IF EXISTS person;
+DROP TABLE IF EXISTS manager;
+DROP TABLE IF EXISTS referee;
 DROP TABLE IF EXISTS match;
 DROP TABLE IF EXISTS stadium;
 DROP TABLE IF EXISTS country;
@@ -47,8 +48,40 @@ DROP TABLE IF EXISTS play;
 DROP TABLE IF EXISTS position;
 DROP TABLE IF EXISTS definition;
 DROP TABLE IF EXISTS height;
+DROP TABLE IF EXISTS competition;
 '''
 create = '''
+CREATE TABLE competition (
+    competition_id INT PRIMARY KEY,
+    competition_name VARCHAR(128)
+);
+INSERT INTO competition VALUES (1, 'Regular Season');
+INSERT INTO competition VALUES (2, 'Play-In Round');
+INSERT INTO competition VALUES (6, 'Europa League Play-offs - Semi-finals');
+INSERT INTO competition VALUES (8, 'MLS Cup - Conference Semi-finals');
+INSERT INTO competition VALUES (9, '3rd Qualifying Round');
+INSERT INTO competition VALUES (10, 'Group Stage');
+INSERT INTO competition VALUES (11, 'Quarter-finals');
+INSERT INTO competition VALUES (12, 'Europa League Play-offs - Finals');
+INSERT INTO competition VALUES (13, '16th Finals');
+INSERT INTO competition VALUES (14, 'Promotion Play-offs - Finals');
+INSERT INTO competition VALUES (15, 'Semi-finals');
+INSERT INTO competition VALUES (18, 'Promotion Play-offs - Semi Finals');
+INSERT INTO competition VALUES (19, 'Preliminary Round');
+INSERT INTO competition VALUES (20, '2nd Round');
+INSERT INTO competition VALUES (21, 'Europa League Play-offs - Quarter-finals');
+INSERT INTO competition VALUES (22, '2nd Qualifying Round');
+INSERT INTO competition VALUES (23, 'MLS Cup - Conference Finals');
+INSERT INTO competition VALUES (24, 'Promotion Play-offs - 2nd Round');
+INSERT INTO competition VALUES (25, '3rd Place Final');
+INSERT INTO competition VALUES (26, 'Final');
+INSERT INTO competition VALUES (27, 'Promotion Play-offs - 2nd Round');
+INSERT INTO competition VALUES (28, 'Play-offs');
+INSERT INTO competition VALUES (29, '1st Qualifying Round');
+INSERT INTO competition VALUES (31, 'Preliminary Round - Semi-finals');
+INSERT INTO competition VALUES (33, '8th Finals');
+INSERT INTO competition VALUES (34, '1st Phase');
+INSERT INTO competition VALUES (35, 'Preliminary Round - Final');
 CREATE TABLE position (
     position_id INT PRIMARY KEY,
     position_name VARCHAR(128)
@@ -119,19 +152,33 @@ CREATE TABLE match (
     home_score INT,
     away_score INT,
     match_week INT,
-    competition_stage VARCHAR(32),
+    competition_id INT,
     stadium_id INT,
     FOREIGN KEY (home_team_id) REFERENCES team (team_id),
     FOREIGN KEY (away_team_id) REFERENCES team (team_id),
     FOREIGN KEY (season_id) REFERENCES season (season_id),
     FOREIGN KEY (country_id) REFERENCES country (country_id),
-    FOREIGN KEY (stadium_id) REFERENCES stadium (stadium_id)
+    FOREIGN KEY (stadium_id) REFERENCES stadium (stadium_id),
+    FOREIGN KEY (competition_id) REFERENCES competition (competition_id)
 );
 CREATE TABLE manager (
+    manager_id INT PRIMARY KEY,
+    manager_name VARCHAR(128),
     match_id INT,
-    person_id INT,
+    team_id INT,
+    manager_nickname VARCHAR(128),
+    country_id INT,
     FOREIGN KEY (match_id) REFERENCES match (match_id),
-    FOREIGN KEY (person_id) REFERENCES person (person_id)
+    FOREIGN KEY (team_id) REFERENCES team (team_id),
+    FOREIGN KEY (country_id) REFERENCES country (country_id)
+);
+CREATE TABLE referee (
+    referee_id INT PRIMARY KEY,
+    referee_name VARCHAR(128),
+    match_id INT,
+    country_id INT,
+    FOREIGN KEY (match_id) REFERENCES match (match_id),
+    FOREIGN KEY (country_id) REFERENCES country (country_id)
 );
 CREATE TABLE play (
     play_id INT PRIMARY KEY,
@@ -1878,7 +1925,7 @@ INSERT INTO match (
     home_score,
     away_score,
     match_week,
-    competition_stage,
+    competition_id,
     stadium_id
 ) VALUES (%s, %s, %s, (
     SELECT country_id
@@ -1913,4 +1960,24 @@ INSERT INTO card (
     FROM definition
     WHERE definition_name = %s
 ), %s, %s)
+'''
+manager = '''
+INSERT INTO manager (
+    manager_id,
+    manager_name,
+    match_id,
+    team_id,
+    manager_nickname,
+    country_id
+) VALUES (%s, %s, %s, %s, %s, %s)
+ON CONFLICT DO NOTHING;
+'''
+referee = '''
+INSERT INTO referee (
+    referee_id,
+    referee_name,
+    match_id,
+    country_id
+) VALUES (%s, %s, %s, %s)
+ON CONFLICT DO NOTHING;
 '''

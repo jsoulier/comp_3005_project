@@ -32,6 +32,8 @@ def cd(path):
 def download():
     if os.path.exists('json'):
         return
+    
+    # clone competitions
     subprocess.run([
         'git',
         'clone',
@@ -56,6 +58,8 @@ def download():
         matches = []
         events = []
         lineups = []
+
+        # clone matches
         path = os.path.join('data', 'competitions.json')
         with open(path, 'r', encoding='utf-8') as file:
             data = json.load(file)
@@ -80,6 +84,8 @@ def download():
             'add',
             '--no-cone'
         ] + ['/' + path for path in matches])
+
+        # clone events and matches
         for path in matches:
             path = os.path.normpath(path)
             with open(path, 'r', encoding='utf-8') as file:
@@ -146,12 +152,16 @@ def populate(cursor):
     match_ = []
     lineup_ = []
     card_ = []
+    manager_ = []
+    referee = []
     shot_id = 0
     with cd('json'):
         matches = glob.glob(os.path.join('data', 'matches', '**', '*.json'))
         for path in matches:
             with open(path, 'r', encoding='utf-8') as file:
                 data = json.load(file)
+
+            # add matches
             for item in data:
                 match_id = item['match_id']
                 match_date = item['match_date']
@@ -163,16 +173,16 @@ def populate(cursor):
                 home_score = item['home_score']
                 away_score = item['away_score']
                 match_week = item['match_week']
-                competition_stage = item['competition_stage']['name']
+                competition_id = item['competition_stage']['id']
                 country_name  = item['competition']['country_name']
                 competition_name = item['competition']['competition_name']
                 season_name = item['season']['season_name']
-                stadium_id = item.get('stadium', {}).get('id')
-                stadium_name = item.get('stadium', {}).get('name')
-                country_id = item.get('stadium', {}).get('country', {}).get('id')
                 cursor.execute(sql.season, (competition_name, season_name))
                 season_id = cursor.fetchone()[0]
-                if stadium_id and stadium_name:
+                stadium_id = item.get('stadium', {}).get('id')
+                if stadium_id != None:
+                    stadium_name = item['stadium']['name']
+                    country_id = item['stadium']['country']['id']
                     stadium.append((stadium_id, stadium_name, country_id))
                 match_.append((
                     match_id,
@@ -187,9 +197,50 @@ def populate(cursor):
                     home_score,
                     away_score,
                     match_week,
-                    competition_stage,
+                    competition_id,
                     stadium_id
                 ))
+
+                # add managers
+                for manager in item['home_team'].get('managers', []):
+                    manager_id = manager['id']
+                    manager_name = manager['name']
+                    manager_nickname = manager['nickname']
+                    country_id = manager['country']['id']
+                    manager_.append((
+                        manager_id,
+                        manager_name,
+                        match_id,
+                        home_team_id,
+                        manager_nickname,
+                        country_id
+                    ))
+                for manager in item['away_team'].get('managers', []):
+                    manager_id = manager['id']
+                    manager_name = manager['name']
+                    manager_nickname = manager['nickname']
+                    country_id = manager['country']['id']
+                    manager_.append((
+                        manager_id,
+                        manager_name,
+                        match_id,
+                        away_team_id,
+                        manager_nickname,
+                        country_id
+                    ))
+
+                # add referees
+                if item.get('referee', {}):
+                    referee_id = item['referee']['id']
+                    referee_name = item['referee']['name']
+                    country_id = item['referee']['country']['id']
+                    referee.append((
+                        referee_id,
+                        referee_name,
+                        match_id,
+                        country_id
+                    ))
+
                 path = 'data/lineups/' + str(match_id) + '.json'
                 with open(path, 'r', encoding='utf-8') as file:
                     data = json.load(file)
@@ -197,6 +248,8 @@ def populate(cursor):
                     team_id = item['team_id']
                     team_name = item['team_name']
                     team.append((team_id, team_name))
+
+                    # add people
                     for lineup in item['lineup']:
                         person_name = lineup['player_name']
                         person_id = lineup['player_id']
@@ -211,6 +264,8 @@ def populate(cursor):
                             person_nickname,
                             country_id
                         ))
+
+                        # add positions
                         for position in lineup['positions']:
                             position_id = position['position_id']
                             from_ = position['from']
@@ -231,6 +286,8 @@ def populate(cursor):
                                 start_reason,
                                 end_reason
                             ))
+                        
+                        # add cards
                         for card in lineup['cards']:
                             time = card['time']
                             card_type_id = card['card_type']
@@ -244,6 +301,8 @@ def populate(cursor):
                                 reason,
                                 period
                             ))
+
+                # add events
                 path = 'data/events/' + str(match_id) + '.json'
                 with open(path, 'r', encoding='utf-8') as file:
                     data = json.load(file)
@@ -547,6 +606,8 @@ def populate(cursor):
                                 end_x,
                                 end_y
                             ))
+
+    # run sql
     cursor.executemany(sql.country, country)
     cursor.executemany(sql.stadium, stadium)
     cursor.executemany(sql.team, team)
@@ -589,12 +650,14 @@ def populate(cursor):
     cursor.executemany(sql.freeze_frame, freeze_frame)
     cursor.executemany(sql.lineup, lineup_)
     cursor.executemany(sql.card, card_)
+    cursor.executemany(sql.manager, manager_)
+    cursor.executemany(sql.referee, referee)
 
 def export():
     os.environ['PGPASSWORD'] = password
     subprocess.run([
         'pg_dump.exe',
-        '--file', '..\\dbexport.sql',
+        '--file', os.path.join('..', 'dbexport.sql'),
         '--host', host,
         '--port', port,
         '--username', username,
@@ -606,6 +669,9 @@ def export():
 
 def main():
     os.chdir(os.path.dirname(os.path.realpath(__file__)))
+    download()
+
+    # json to sql
     connection = psycopg.connect(
         dbname=name,
         user=username,
@@ -614,10 +680,11 @@ def main():
         port=port
     )
     cursor = connection.cursor()
-    download()
     cursor.execute(sql.drop)
     cursor.execute(sql.create)
     populate(cursor)
+    
+    # export sql
     connection.commit()
     cursor.close()
     connection.close()
