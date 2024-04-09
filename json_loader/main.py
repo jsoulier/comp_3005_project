@@ -144,6 +144,8 @@ def populate(cursor):
     freeze_frame = []
     stadium = []
     match_ = []
+    lineup_ = []
+    card_ = []
     shot_id = 0
     with cd('json'):
         matches = glob.glob(os.path.join('data', 'matches', '**', '*.json'))
@@ -209,6 +211,39 @@ def populate(cursor):
                             person_nickname,
                             country_id
                         ))
+                        for position in lineup['positions']:
+                            position_id = position['position_id']
+                            from_ = position['from']
+                            to_ = position['to']
+                            from_period = position['from_period']
+                            to_period = position['to_period']
+                            start_reason = position['start_reason']
+                            end_reason = position['end_reason']
+                            lineup_.append((
+                                match_id,
+                                person_id,
+                                position_id,
+                                jersey_number,
+                                from_,
+                                to_,
+                                from_period,
+                                to_period,
+                                start_reason,
+                                end_reason
+                            ))
+                        for card in lineup['cards']:
+                            time = card['time']
+                            card_type_id = card['card_type']
+                            reason = card['reason']
+                            period = card['period']
+                            card_.append((
+                                match_id,
+                                person_id,
+                                time,
+                                card_type_id,
+                                reason,
+                                period
+                            ))
                 path = 'data/events/' + str(match_id) + '.json'
                 with open(path, 'r', encoding='utf-8') as file:
                     data = json.load(file)
@@ -230,6 +265,7 @@ def populate(cursor):
                     off_camera = 'off_camera' in item
                     common = (
                         match_id,
+                        team_id,
                         person_id,
                         play_id,
                         position_id,
@@ -405,7 +441,7 @@ def populate(cursor):
                             card_id = bad_behaviour_.get('card', {}).get('id')
                             bad_behaviour.append(common + (card_id, ))
                         case 25:
-                            own_goal_for.append(common + (team_id, ))
+                            own_goal_for.append(common)
                         case 26:
                             player_on.append(common)
                         case 27:
@@ -478,6 +514,7 @@ def populate(cursor):
                                 jersey_number = lineup['jersey_number']
                                 starting_xi.append((
                                     match_id,
+                                    team_id,
                                     person_id,
                                     position_id,
                                     jersey_number
@@ -550,6 +587,8 @@ def populate(cursor):
     cursor.executemany(sql.ball_receipt, ball_receipt)
     cursor.executemany(sql.carry, carry)
     cursor.executemany(sql.freeze_frame, freeze_frame)
+    cursor.executemany(sql.lineup, lineup_)
+    cursor.executemany(sql.card, card_)
 
 def export():
     os.environ['PGPASSWORD'] = password

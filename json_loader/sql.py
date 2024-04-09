@@ -258,10 +258,12 @@ CREATE TABLE lineup (
     person_id INT,
     position_id INT,
     jersey_number INT,
-    from_ DATE,
-    to_ DATE,
+    from_ VARCHAR(32),
+    to_ VARCHAR(32),
     from_period INT,
     to_period INT,
+    start_reason VARCHAR(128),
+    end_reason VARCHAR(128),
     FOREIGN KEY (match_id) REFERENCES match (match_id),
     FOREIGN KEY (person_id) REFERENCES person (person_id),
     FOREIGN KEY (position_id) REFERENCES position (position_id)
@@ -279,6 +281,7 @@ CREATE TABLE card (
 );
 CREATE TABLE ball_recovery (
     match_id INT,
+    team_id INT,
     person_id INT,
     play_id INT,
     position_id INT,
@@ -295,11 +298,14 @@ CREATE TABLE ball_recovery (
     recovery_failure BOOLEAN,
     FOREIGN KEY (person_id) REFERENCES person (person_id),
     FOREIGN KEY (play_id) REFERENCES play (play_id),
+    FOREIGN KEY (match_id) REFERENCES match (match_id),
+    FOREIGN KEY (team_id) REFERENCES team (team_id),
     FOREIGN KEY (position_id) REFERENCES position (position_id),
     FOREIGN KEY (possession_id) REFERENCES team (team_id)
 );
 CREATE TABLE dispossessed (
     match_id INT,
+    team_id INT,
     person_id INT,
     play_id INT,
     position_id INT,
@@ -314,11 +320,14 @@ CREATE TABLE dispossessed (
     under_pressure BOOLEAN,
     FOREIGN KEY (person_id) REFERENCES person (person_id),
     FOREIGN KEY (play_id) REFERENCES play (play_id),
+    FOREIGN KEY (match_id) REFERENCES match (match_id),
+    FOREIGN KEY (team_id) REFERENCES team (team_id),
     FOREIGN KEY (position_id) REFERENCES position (position_id),
     FOREIGN KEY (possession_id) REFERENCES team (team_id)
 );
 CREATE TABLE duel (
     match_id INT,
+    team_id INT,
     person_id INT,
     play_id INT,
     position_id INT,
@@ -338,11 +347,14 @@ CREATE TABLE duel (
     FOREIGN KEY (outcome_id) REFERENCES definition (definition_id),
     FOREIGN KEY (person_id) REFERENCES person (person_id),
     FOREIGN KEY (play_id) REFERENCES play (play_id),
+    FOREIGN KEY (match_id) REFERENCES match (match_id),
+    FOREIGN KEY (team_id) REFERENCES team (team_id),
     FOREIGN KEY (position_id) REFERENCES position (position_id),
     FOREIGN KEY (possession_id) REFERENCES team (team_id)
 );
 CREATE TABLE camera_on (
     match_id INT,
+    team_id INT,
     person_id INT,
     play_id INT,
     position_id INT,
@@ -357,11 +369,14 @@ CREATE TABLE camera_on (
     under_pressure BOOLEAN,
     FOREIGN KEY (person_id) REFERENCES person (person_id),
     FOREIGN KEY (play_id) REFERENCES play (play_id),
+    FOREIGN KEY (match_id) REFERENCES match (match_id),
+    FOREIGN KEY (team_id) REFERENCES team (team_id),
     FOREIGN KEY (position_id) REFERENCES position (position_id),
     FOREIGN KEY (possession_id) REFERENCES team (team_id)
 );
 CREATE TABLE block (
     match_id INT,
+    team_id INT,
     person_id INT,
     play_id INT,
     position_id INT,
@@ -380,11 +395,14 @@ CREATE TABLE block (
     save_block BOOLEAN,
     FOREIGN KEY (person_id) REFERENCES person (person_id),
     FOREIGN KEY (play_id) REFERENCES play (play_id),
+    FOREIGN KEY (match_id) REFERENCES match (match_id),
+    FOREIGN KEY (team_id) REFERENCES team (team_id),
     FOREIGN KEY (position_id) REFERENCES position (position_id),
     FOREIGN KEY (possession_id) REFERENCES team (team_id)
 );
 CREATE TABLE offside (
     match_id INT,
+    team_id INT,
     person_id INT,
     play_id INT,
     position_id INT,
@@ -399,11 +417,14 @@ CREATE TABLE offside (
     under_pressure BOOLEAN,
     FOREIGN KEY (person_id) REFERENCES person (person_id),
     FOREIGN KEY (play_id) REFERENCES play (play_id),
+    FOREIGN KEY (match_id) REFERENCES match (match_id),
+    FOREIGN KEY (team_id) REFERENCES team (team_id),
     FOREIGN KEY (position_id) REFERENCES position (position_id),
     FOREIGN KEY (possession_id) REFERENCES team (team_id)
 );
 CREATE TABLE clearance (
     match_id INT,
+    team_id INT,
     person_id INT,
     play_id INT,
     position_id INT,
@@ -421,11 +442,14 @@ CREATE TABLE clearance (
     FOREIGN KEY (body_part_id) REFERENCES definition (definition_id),
     FOREIGN KEY (person_id) REFERENCES person (person_id),
     FOREIGN KEY (play_id) REFERENCES play (play_id),
+    FOREIGN KEY (match_id) REFERENCES match (match_id),
+    FOREIGN KEY (team_id) REFERENCES team (team_id),
     FOREIGN KEY (position_id) REFERENCES position (position_id),
     FOREIGN KEY (possession_id) REFERENCES team (team_id)
 );
 CREATE TABLE interception (
     match_id INT,
+    team_id INT,
     person_id INT,
     play_id INT,
     position_id INT,
@@ -440,11 +464,14 @@ CREATE TABLE interception (
     under_pressure BOOLEAN,
     FOREIGN KEY (person_id) REFERENCES person (person_id),
     FOREIGN KEY (play_id) REFERENCES play (play_id),
+    FOREIGN KEY (match_id) REFERENCES match (match_id),
+    FOREIGN KEY (team_id) REFERENCES team (team_id),
     FOREIGN KEY (position_id) REFERENCES position (position_id),
     FOREIGN KEY (possession_id) REFERENCES team (team_id)
 );
 CREATE TABLE dribble (
     match_id INT,
+    team_id INT,
     person_id INT,
     play_id INT,
     position_id INT,
@@ -464,11 +491,14 @@ CREATE TABLE dribble (
     FOREIGN KEY (outcome_id) REFERENCES definition (definition_id),
     FOREIGN KEY (person_id) REFERENCES person (person_id),
     FOREIGN KEY (play_id) REFERENCES play (play_id),
+    FOREIGN KEY (match_id) REFERENCES match (match_id),
+    FOREIGN KEY (team_id) REFERENCES team (team_id),
     FOREIGN KEY (position_id) REFERENCES position (position_id),
     FOREIGN KEY (possession_id) REFERENCES team (team_id)
 );
 CREATE TABLE shot (
     match_id INT,
+    team_id INT,
     person_id INT,
     play_id INT,
     position_id INT,
@@ -501,11 +531,14 @@ CREATE TABLE shot (
     FOREIGN KEY (outcome_id) REFERENCES definition (definition_id),
     FOREIGN KEY (person_id) REFERENCES person (person_id),
     FOREIGN KEY (play_id) REFERENCES play (play_id),
+    FOREIGN KEY (match_id) REFERENCES match (match_id),
+    FOREIGN KEY (team_id) REFERENCES team (team_id),
     FOREIGN KEY (position_id) REFERENCES position (position_id),
     FOREIGN KEY (possession_id) REFERENCES team (team_id)
 );
 CREATE TABLE pressure (
     match_id INT,
+    team_id INT,
     person_id INT,
     play_id INT,
     position_id INT,
@@ -521,11 +554,14 @@ CREATE TABLE pressure (
     counter_pressure BOOLEAN,
     FOREIGN KEY (person_id) REFERENCES person (person_id),
     FOREIGN KEY (play_id) REFERENCES play (play_id),
+    FOREIGN KEY (match_id) REFERENCES match (match_id),
+    FOREIGN KEY (team_id) REFERENCES team (team_id),
     FOREIGN KEY (position_id) REFERENCES position (position_id),
     FOREIGN KEY (possession_id) REFERENCES team (team_id)
 );
 CREATE TABLE half_start (
     match_id INT,
+    team_id INT,
     person_id INT,
     play_id INT,
     position_id INT,
@@ -541,11 +577,14 @@ CREATE TABLE half_start (
     late_video_start BOOLEAN,
     FOREIGN KEY (person_id) REFERENCES person (person_id),
     FOREIGN KEY (play_id) REFERENCES play (play_id),
+    FOREIGN KEY (match_id) REFERENCES match (match_id),
+    FOREIGN KEY (team_id) REFERENCES team (team_id),
     FOREIGN KEY (position_id) REFERENCES position (position_id),
     FOREIGN KEY (possession_id) REFERENCES team (team_id)
 );
 CREATE TABLE substitution (
     match_id INT,
+    team_id INT,
     person_id INT,
     play_id INT,
     position_id INT,
@@ -564,11 +603,14 @@ CREATE TABLE substitution (
     FOREIGN KEY (outcome_id) REFERENCES definition (definition_id),
     FOREIGN KEY (person_id) REFERENCES person (person_id),
     FOREIGN KEY (play_id) REFERENCES play (play_id),
+    FOREIGN KEY (match_id) REFERENCES match (match_id),
+    FOREIGN KEY (team_id) REFERENCES team (team_id),
     FOREIGN KEY (position_id) REFERENCES position (position_id),
     FOREIGN KEY (possession_id) REFERENCES team (team_id)
 );
 CREATE TABLE own_goal_against (
     match_id INT,
+    team_id INT,
     person_id INT,
     play_id INT,
     position_id INT,
@@ -583,11 +625,14 @@ CREATE TABLE own_goal_against (
     under_pressure BOOLEAN,
     FOREIGN KEY (person_id) REFERENCES person (person_id),
     FOREIGN KEY (play_id) REFERENCES play (play_id),
+    FOREIGN KEY (match_id) REFERENCES match (match_id),
+    FOREIGN KEY (team_id) REFERENCES team (team_id),
     FOREIGN KEY (position_id) REFERENCES position (position_id),
     FOREIGN KEY (possession_id) REFERENCES team (team_id)
 );
 CREATE TABLE foul_won (
     match_id INT,
+    team_id INT,
     person_id INT,
     play_id INT,
     position_id INT,
@@ -605,11 +650,14 @@ CREATE TABLE foul_won (
     penalty BOOLEAN,
     FOREIGN KEY (person_id) REFERENCES person (person_id),
     FOREIGN KEY (play_id) REFERENCES play (play_id),
+    FOREIGN KEY (match_id) REFERENCES match (match_id),
+    FOREIGN KEY (team_id) REFERENCES team (team_id),
     FOREIGN KEY (position_id) REFERENCES position (position_id),
     FOREIGN KEY (possession_id) REFERENCES team (team_id)
 );
 CREATE TABLE foul_committed (
     match_id INT,
+    team_id INT,
     person_id INT,
     play_id INT,
     position_id INT,
@@ -632,11 +680,14 @@ CREATE TABLE foul_committed (
     FOREIGN KEY (card_id) REFERENCES definition (definition_id),
     FOREIGN KEY (person_id) REFERENCES person (person_id),
     FOREIGN KEY (play_id) REFERENCES play (play_id),
+    FOREIGN KEY (match_id) REFERENCES match (match_id),
+    FOREIGN KEY (team_id) REFERENCES team (team_id),
     FOREIGN KEY (position_id) REFERENCES position (position_id),
     FOREIGN KEY (possession_id) REFERENCES team (team_id)
 );
 CREATE TABLE goal_keeper (
     match_id INT,
+    team_id INT,
     person_id INT,
     play_id INT,
     position_id INT,
@@ -661,11 +712,14 @@ CREATE TABLE goal_keeper (
     FOREIGN KEY (outcome_id) REFERENCES definition (definition_id),
     FOREIGN KEY (person_id) REFERENCES person (person_id),
     FOREIGN KEY (play_id) REFERENCES play (play_id),
+    FOREIGN KEY (match_id) REFERENCES match (match_id),
+    FOREIGN KEY (team_id) REFERENCES team (team_id),
     FOREIGN KEY (position_id) REFERENCES position (position_id),
     FOREIGN KEY (possession_id) REFERENCES team (team_id)
 );
 CREATE TABLE bad_behaviour (
     match_id INT,
+    team_id INT,
     person_id INT,
     play_id INT,
     position_id INT,
@@ -682,11 +736,14 @@ CREATE TABLE bad_behaviour (
     FOREIGN KEY (card_id) REFERENCES definition (definition_id),
     FOREIGN KEY (person_id) REFERENCES person (person_id),
     FOREIGN KEY (play_id) REFERENCES play (play_id),
+    FOREIGN KEY (match_id) REFERENCES match (match_id),
+    FOREIGN KEY (team_id) REFERENCES team (team_id),
     FOREIGN KEY (position_id) REFERENCES position (position_id),
     FOREIGN KEY (possession_id) REFERENCES team (team_id)
 );
 CREATE TABLE own_goal_for (
     match_id INT,
+    team_id INT,
     person_id INT,
     play_id INT,
     position_id INT,
@@ -699,15 +756,17 @@ CREATE TABLE own_goal_for (
     y FLOAT,
     duration FLOAT,
     under_pressure BOOLEAN,
-    team_id INT,
     FOREIGN KEY (team_id) REFERENCES team (team_id),
     FOREIGN KEY (person_id) REFERENCES person (person_id),
     FOREIGN KEY (play_id) REFERENCES play (play_id),
+    FOREIGN KEY (match_id) REFERENCES match (match_id),
+    FOREIGN KEY (team_id) REFERENCES team (team_id),
     FOREIGN KEY (position_id) REFERENCES position (position_id),
     FOREIGN KEY (possession_id) REFERENCES team (team_id)
 );
 CREATE TABLE player_on (
     match_id INT,
+    team_id INT,
     person_id INT,
     play_id INT,
     position_id INT,
@@ -722,11 +781,14 @@ CREATE TABLE player_on (
     under_pressure BOOLEAN,
     FOREIGN KEY (person_id) REFERENCES person (person_id),
     FOREIGN KEY (play_id) REFERENCES play (play_id),
+    FOREIGN KEY (match_id) REFERENCES match (match_id),
+    FOREIGN KEY (team_id) REFERENCES team (team_id),
     FOREIGN KEY (position_id) REFERENCES position (position_id),
     FOREIGN KEY (possession_id) REFERENCES team (team_id)
 );
 CREATE TABLE player_off (
     match_id INT,
+    team_id INT,
     person_id INT,
     play_id INT,
     position_id INT,
@@ -742,11 +804,14 @@ CREATE TABLE player_off (
     permanent BOOLEAN,
     FOREIGN KEY (person_id) REFERENCES person (person_id),
     FOREIGN KEY (play_id) REFERENCES play (play_id),
+    FOREIGN KEY (match_id) REFERENCES match (match_id),
+    FOREIGN KEY (team_id) REFERENCES team (team_id),
     FOREIGN KEY (position_id) REFERENCES position (position_id),
     FOREIGN KEY (possession_id) REFERENCES team (team_id)
 );
 CREATE TABLE shield (
     match_id INT,
+    team_id INT,
     person_id INT,
     play_id INT,
     position_id INT,
@@ -761,11 +826,14 @@ CREATE TABLE shield (
     under_pressure BOOLEAN,
     FOREIGN KEY (person_id) REFERENCES person (person_id),
     FOREIGN KEY (play_id) REFERENCES play (play_id),
+    FOREIGN KEY (match_id) REFERENCES match (match_id),
+    FOREIGN KEY (team_id) REFERENCES team (team_id),
     FOREIGN KEY (position_id) REFERENCES position (position_id),
     FOREIGN KEY (possession_id) REFERENCES team (team_id)
 );
 CREATE TABLE pass (
     match_id INT,
+    team_id INT,
     person_id INT,
     play_id INT,
     position_id INT,
@@ -805,11 +873,14 @@ CREATE TABLE pass (
     FOREIGN KEY (technique_id) REFERENCES definition (definition_id),
     FOREIGN KEY (person_id) REFERENCES person (person_id),
     FOREIGN KEY (play_id) REFERENCES play (play_id),
+    FOREIGN KEY (match_id) REFERENCES match (match_id),
+    FOREIGN KEY (team_id) REFERENCES team (team_id),
     FOREIGN KEY (position_id) REFERENCES position (position_id),
     FOREIGN KEY (possession_id) REFERENCES team (team_id)
 );
 CREATE TABLE fifty_fifty (
     match_id INT,
+    team_id INT,
     person_id INT,
     play_id INT,
     position_id INT,
@@ -827,11 +898,14 @@ CREATE TABLE fifty_fifty (
     FOREIGN KEY (outcome_id) REFERENCES definition (definition_id),
     FOREIGN KEY (person_id) REFERENCES person (person_id),
     FOREIGN KEY (play_id) REFERENCES play (play_id),
+    FOREIGN KEY (match_id) REFERENCES match (match_id),
+    FOREIGN KEY (team_id) REFERENCES team (team_id),
     FOREIGN KEY (position_id) REFERENCES position (position_id),
     FOREIGN KEY (possession_id) REFERENCES team (team_id)
 );
 CREATE TABLE half_end (
     match_id INT,
+    team_id INT,
     person_id INT,
     play_id INT,
     position_id INT,
@@ -848,20 +922,25 @@ CREATE TABLE half_end (
     match_suspended BOOLEAN,
     FOREIGN KEY (person_id) REFERENCES person (person_id),
     FOREIGN KEY (play_id) REFERENCES play (play_id),
+    FOREIGN KEY (match_id) REFERENCES match (match_id),
+    FOREIGN KEY (team_id) REFERENCES team (team_id),
     FOREIGN KEY (position_id) REFERENCES position (position_id),
     FOREIGN KEY (possession_id) REFERENCES team (team_id)
 );
 CREATE TABLE starting_xi (
     match_id INT,
+    team_id INT,
     person_id INT,
     position_id INT,
     jersey_number INT,
     FOREIGN KEY (match_id) REFERENCES match (match_id),
+    FOREIGN KEY (team_id) REFERENCES team (team_id),
     FOREIGN KEY (person_id) REFERENCES person (person_id),
     FOREIGN KEY (position_id) REFERENCES position (position_id)
 );
 CREATE TABLE tactical_shift (
     match_id INT,
+    team_id INT,
     person_id INT,
     play_id INT,
     position_id INT,
@@ -876,11 +955,14 @@ CREATE TABLE tactical_shift (
     under_pressure BOOLEAN,
     FOREIGN KEY (person_id) REFERENCES person (person_id),
     FOREIGN KEY (play_id) REFERENCES play (play_id),
+    FOREIGN KEY (match_id) REFERENCES match (match_id),
+    FOREIGN KEY (team_id) REFERENCES team (team_id),
     FOREIGN KEY (position_id) REFERENCES position (position_id),
     FOREIGN KEY (possession_id) REFERENCES team (team_id)
 );
 CREATE TABLE error (
     match_id INT,
+    team_id INT,
     person_id INT,
     play_id INT,
     position_id INT,
@@ -895,11 +977,14 @@ CREATE TABLE error (
     under_pressure BOOLEAN,
     FOREIGN KEY (person_id) REFERENCES person (person_id),
     FOREIGN KEY (play_id) REFERENCES play (play_id),
+    FOREIGN KEY (match_id) REFERENCES match (match_id),
+    FOREIGN KEY (team_id) REFERENCES team (team_id),
     FOREIGN KEY (position_id) REFERENCES position (position_id),
     FOREIGN KEY (possession_id) REFERENCES team (team_id)
 );
 CREATE TABLE miscontrol (
     match_id INT,
+    team_id INT,
     person_id INT,
     play_id INT,
     position_id INT,
@@ -915,11 +1000,14 @@ CREATE TABLE miscontrol (
     aerial_won BOOLEAN,
     FOREIGN KEY (person_id) REFERENCES person (person_id),
     FOREIGN KEY (play_id) REFERENCES play (play_id),
+    FOREIGN KEY (match_id) REFERENCES match (match_id),
+    FOREIGN KEY (team_id) REFERENCES team (team_id),
     FOREIGN KEY (position_id) REFERENCES position (position_id),
     FOREIGN KEY (possession_id) REFERENCES team (team_id)
 );
 CREATE TABLE dribbled_past (
     match_id INT,
+    team_id INT,
     person_id INT,
     play_id INT,
     position_id INT,
@@ -935,11 +1023,14 @@ CREATE TABLE dribbled_past (
     counter_pressure BOOLEAN,
     FOREIGN KEY (person_id) REFERENCES person (person_id),
     FOREIGN KEY (play_id) REFERENCES play (play_id),
+    FOREIGN KEY (match_id) REFERENCES match (match_id),
+    FOREIGN KEY (team_id) REFERENCES team (team_id),
     FOREIGN KEY (position_id) REFERENCES position (position_id),
     FOREIGN KEY (possession_id) REFERENCES team (team_id)
 );
 CREATE TABLE injury_stoppage (
     match_id INT,
+    team_id INT,
     person_id INT,
     play_id INT,
     position_id INT,
@@ -955,11 +1046,14 @@ CREATE TABLE injury_stoppage (
     in_chain BOOLEAN,
     FOREIGN KEY (person_id) REFERENCES person (person_id),
     FOREIGN KEY (play_id) REFERENCES play (play_id),
+    FOREIGN KEY (match_id) REFERENCES match (match_id),
+    FOREIGN KEY (team_id) REFERENCES team (team_id),
     FOREIGN KEY (position_id) REFERENCES position (position_id),
     FOREIGN KEY (possession_id) REFERENCES team (team_id)
 );
 CREATE TABLE referee_ball_drop (
     match_id INT,
+    team_id INT,
     person_id INT,
     play_id INT,
     position_id INT,
@@ -975,11 +1069,14 @@ CREATE TABLE referee_ball_drop (
     off_camera BOOLEAN,
     FOREIGN KEY (person_id) REFERENCES person (person_id),
     FOREIGN KEY (play_id) REFERENCES play (play_id),
+    FOREIGN KEY (match_id) REFERENCES match (match_id),
+    FOREIGN KEY (team_id) REFERENCES team (team_id),
     FOREIGN KEY (position_id) REFERENCES position (position_id),
     FOREIGN KEY (possession_id) REFERENCES team (team_id)
 );
 CREATE TABLE ball_receipt (
     match_id INT,
+    team_id INT,
     person_id INT,
     play_id INT,
     position_id INT,
@@ -996,11 +1093,14 @@ CREATE TABLE ball_receipt (
     FOREIGN KEY (outcome_id) REFERENCES definition (definition_id),
     FOREIGN KEY (person_id) REFERENCES person (person_id),
     FOREIGN KEY (play_id) REFERENCES play (play_id),
+    FOREIGN KEY (match_id) REFERENCES match (match_id),
+    FOREIGN KEY (team_id) REFERENCES team (team_id),
     FOREIGN KEY (position_id) REFERENCES position (position_id),
     FOREIGN KEY (possession_id) REFERENCES team (team_id)
 );
 CREATE TABLE carry (
     match_id INT,
+    team_id INT,
     person_id INT,
     play_id INT,
     position_id INT,
@@ -1017,6 +1117,8 @@ CREATE TABLE carry (
     end_y FLOAT,
     FOREIGN KEY (person_id) REFERENCES person (person_id),
     FOREIGN KEY (play_id) REFERENCES play (play_id),
+    FOREIGN KEY (match_id) REFERENCES match (match_id),
+    FOREIGN KEY (team_id) REFERENCES team (team_id),
     FOREIGN KEY (position_id) REFERENCES position (position_id),
     FOREIGN KEY (possession_id) REFERENCES team (team_id)
 );
@@ -1074,6 +1176,7 @@ ON CONFLICT DO NOTHING;
 ball_recovery = '''
 INSERT INTO ball_recovery (
     match_id,
+    team_id,
     person_id,
     play_id,
     position_id,
@@ -1088,11 +1191,12 @@ INSERT INTO ball_recovery (
     under_pressure,
     offensive,
     recovery_failure
-) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
 '''
 dispossessed = '''
 INSERT INTO dispossessed (
     match_id,
+    team_id,
     person_id,
     play_id,
     position_id,
@@ -1105,10 +1209,12 @@ INSERT INTO dispossessed (
     y,
     duration,
     under_pressure
-) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
 '''
 duel = '''
-INSERT INTO duel (match_id,
+INSERT INTO duel (
+    match_id,
+    team_id,
     person_id,
     play_id,
     position_id,
@@ -1124,10 +1230,12 @@ INSERT INTO duel (match_id,
     counter_pressure,
     type_id,
     outcome_id
-) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
 '''
 camera_on = '''
-INSERT INTO camera_on (match_id,
+INSERT INTO camera_on (
+    match_id,
+    team_id,
     person_id,
     play_id,
     position_id,
@@ -1140,10 +1248,12 @@ INSERT INTO camera_on (match_id,
     y,
     duration,
     under_pressure
-) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
 '''
 block = '''
-INSERT INTO block (match_id,
+INSERT INTO block (
+    match_id,
+    team_id,
     person_id,
     play_id,
     position_id,
@@ -1160,10 +1270,12 @@ INSERT INTO block (match_id,
     deflection,
     offensive,
     save_block
-) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
 '''
 offside = '''
-INSERT INTO offside (match_id,
+INSERT INTO offside (
+    match_id,
+    team_id,
     person_id,
     play_id,
     position_id,
@@ -1176,10 +1288,12 @@ INSERT INTO offside (match_id,
     y,
     duration,
     under_pressure
-) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
 '''
 clearance = '''
-INSERT INTO clearance (match_id,
+INSERT INTO clearance (
+    match_id,
+    team_id,
     person_id,
     play_id,
     position_id,
@@ -1194,10 +1308,12 @@ INSERT INTO clearance (match_id,
     under_pressure,
     aerial_won,
     body_part_id
-) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
 '''
 interception = '''
-INSERT INTO interception (match_id,
+INSERT INTO interception (
+    match_id,
+    team_id,
     person_id,
     play_id,
     position_id,
@@ -1210,10 +1326,12 @@ INSERT INTO interception (match_id,
     y,
     duration,
     under_pressure
-) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
 '''
 dribble = '''
-INSERT INTO dribble (match_id,
+INSERT INTO dribble (
+    match_id,
+    team_id,
     person_id,
     play_id,
     position_id,
@@ -1230,10 +1348,12 @@ INSERT INTO dribble (match_id,
     nutmeg,
     no_touch,
     outcome_id
-) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
 '''
 shot = '''
-INSERT INTO shot (match_id,
+INSERT INTO shot (
+    match_id,
+    team_id,
     person_id,
     play_id,
     position_id,
@@ -1260,10 +1380,12 @@ INSERT INTO shot (match_id,
     body_part_id,
     type_id,
     outcome_id
-) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
 '''
 pressure = '''
-INSERT INTO pressure (match_id,
+INSERT INTO pressure (
+    match_id,
+    team_id,
     person_id,
     play_id,
     position_id,
@@ -1277,10 +1399,12 @@ INSERT INTO pressure (match_id,
     duration,
     under_pressure,
     counter_pressure
-) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
 '''
 half_start = '''
-INSERT INTO half_start (match_id,
+INSERT INTO half_start (
+    match_id,
+    team_id,
     person_id,
     play_id,
     position_id,
@@ -1294,10 +1418,12 @@ INSERT INTO half_start (match_id,
     duration,
     under_pressure,
     late_video_start
-) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
 '''
 substitution = '''
-INSERT INTO substitution (match_id,
+INSERT INTO substitution (
+    match_id,
+    team_id,
     person_id,
     play_id,
     position_id,
@@ -1312,10 +1438,12 @@ INSERT INTO substitution (match_id,
     under_pressure,
     replacement_id,
     outcome_id
-) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
 '''
 own_goal_against = '''
-INSERT INTO own_goal_against (match_id,
+INSERT INTO own_goal_against (
+    match_id,
+    team_id,
     person_id,
     play_id,
     position_id,
@@ -1328,10 +1456,12 @@ INSERT INTO own_goal_against (match_id,
     y,
     duration,
     under_pressure
-) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
 '''
 foul_won = '''
-INSERT INTO foul_won (match_id,
+INSERT INTO foul_won (
+    match_id,
+    team_id,
     person_id,
     play_id,
     position_id,
@@ -1347,10 +1477,12 @@ INSERT INTO foul_won (match_id,
     defensive,
     advantage,
     penalty
-) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
 '''
 foul_committed = '''
-INSERT INTO foul_committed (match_id,
+INSERT INTO foul_committed (
+    match_id,
+    team_id,
     person_id,
     play_id,
     position_id,
@@ -1369,10 +1501,12 @@ INSERT INTO foul_committed (match_id,
     advantage,
     penalty,
     card_id
-) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
 '''
 goal_keeper = '''
-INSERT INTO goal_keeper (match_id,
+INSERT INTO goal_keeper (
+    match_id,
+    team_id,
     person_id,
     play_id,
     position_id,
@@ -1390,10 +1524,12 @@ INSERT INTO goal_keeper (match_id,
     body_part_id,
     type_id,
     outcome_id
-) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
 '''
 bad_behaviour = '''
-INSERT INTO bad_behaviour (match_id,
+INSERT INTO bad_behaviour (
+    match_id,
+    team_id,
     person_id,
     play_id,
     position_id,
@@ -1407,27 +1543,12 @@ INSERT INTO bad_behaviour (match_id,
     duration,
     under_pressure,
     card_id
-) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
 '''
 own_goal_for = '''
-INSERT INTO own_goal_for (match_id,
-    person_id,
-    play_id,
-    position_id,
-    period,
-    minute,
-    second,
-    possession,
-    possession_id,
-    x,
-    y,
-    duration,
-    under_pressure,
-    team_id
-) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
-'''
-player_on = '''
-INSERT INTO player_on (match_id,
+INSERT INTO own_goal_for (
+    match_id,
+    team_id,
     person_id,
     play_id,
     position_id,
@@ -1440,10 +1561,30 @@ INSERT INTO player_on (match_id,
     y,
     duration,
     under_pressure
-) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+'''
+player_on = '''
+INSERT INTO player_on (
+    match_id,
+    team_id,
+    person_id,
+    play_id,
+    position_id,
+    period,
+    minute,
+    second,
+    possession,
+    possession_id,
+    x,
+    y,
+    duration,
+    under_pressure
+) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
 '''
 player_off = '''
-INSERT INTO player_off (match_id,
+INSERT INTO player_off (
+    match_id,
+    team_id,
     person_id,
     play_id,
     position_id,
@@ -1457,10 +1598,12 @@ INSERT INTO player_off (match_id,
     duration,
     under_pressure,
     permanent
-) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
 '''
 shield = '''
-INSERT INTO shield (match_id,
+INSERT INTO shield (
+    match_id,
+    team_id,
     person_id,
     play_id,
     position_id,
@@ -1473,10 +1616,12 @@ INSERT INTO shield (match_id,
     y,
     duration,
     under_pressure
-) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
 '''
 pass_ = '''
-INSERT INTO pass (match_id,
+INSERT INTO pass (
+    match_id,
+    team_id,
     person_id,
     play_id,
     position_id,
@@ -1508,10 +1653,12 @@ INSERT INTO pass (match_id,
     outcome_id,
     technique_id,
     off_camera
-) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
 '''
 fifty_fifty = '''
-INSERT INTO fifty_fifty (match_id,
+INSERT INTO fifty_fifty (
+    match_id,
+    team_id,
     person_id,
     play_id,
     position_id,
@@ -1526,10 +1673,12 @@ INSERT INTO fifty_fifty (match_id,
     under_pressure,
     outcome_id,
     counter_pressure
-) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
 '''
 half_end = '''
-INSERT INTO half_end (match_id,
+INSERT INTO half_end (
+    match_id,
+    team_id,
     person_id,
     play_id,
     position_id,
@@ -1544,17 +1693,21 @@ INSERT INTO half_end (match_id,
     under_pressure,
     early_video_end,
     match_suspended
-) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
 '''
 starting_xi = '''
-INSERT INTO starting_xi (match_id,
+INSERT INTO starting_xi (
+    match_id,
+    team_id,
     person_id,
     position_id,
     jersey_number
-) VALUES (%s, %s, %s, %s)
+) VALUES (%s, %s, %s, %s, %s)
 '''
 tactical_shift = '''
-INSERT INTO tactical_shift (match_id,
+INSERT INTO tactical_shift (
+    match_id,
+    team_id,
     person_id,
     play_id,
     position_id,
@@ -1567,10 +1720,12 @@ INSERT INTO tactical_shift (match_id,
     y,
     duration,
     under_pressure
-) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
 '''
 error = '''
-INSERT INTO error (match_id,
+INSERT INTO error (
+    match_id,
+    team_id,
     person_id,
     play_id,
     position_id,
@@ -1583,10 +1738,12 @@ INSERT INTO error (match_id,
     y,
     duration,
     under_pressure
-) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
 '''
 miscontrol = '''
-INSERT INTO miscontrol (match_id,
+INSERT INTO miscontrol (
+    match_id,
+    team_id,
     person_id,
     play_id,
     position_id,
@@ -1600,10 +1757,12 @@ INSERT INTO miscontrol (match_id,
     duration,
     under_pressure,
     aerial_won
-) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
 '''
 dribbled_past = '''
-INSERT INTO dribbled_past (match_id,
+INSERT INTO dribbled_past (
+    match_id,
+    team_id,
     person_id,
     play_id,
     position_id,
@@ -1617,10 +1776,12 @@ INSERT INTO dribbled_past (match_id,
     duration,
     under_pressure,
     counter_pressure
-) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
 '''
 injury_stoppage = '''
-INSERT INTO injury_stoppage (match_id,
+INSERT INTO injury_stoppage (
+    match_id,
+    team_id,
     person_id,
     play_id,
     position_id,
@@ -1634,10 +1795,12 @@ INSERT INTO injury_stoppage (match_id,
     duration,
     under_pressure,
     in_chain
-) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
 '''
 referee_ball_drop = '''
-INSERT INTO referee_ball_drop (match_id,
+INSERT INTO referee_ball_drop (
+    match_id,
+    team_id,
     person_id,
     play_id,
     position_id,
@@ -1651,10 +1814,12 @@ INSERT INTO referee_ball_drop (match_id,
     duration,
     under_pressure,
     off_camera
-) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
 '''
 ball_receipt = '''
-INSERT INTO ball_receipt (match_id,
+INSERT INTO ball_receipt (
+    match_id,
+    team_id,
     person_id,
     play_id,
     position_id,
@@ -1668,10 +1833,12 @@ INSERT INTO ball_receipt (match_id,
     duration,
     under_pressure,
     outcome_id
-) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
 '''
 carry = '''
-INSERT INTO carry (match_id,
+INSERT INTO carry (
+    match_id,
+    team_id,
     person_id,
     play_id,
     position_id,
@@ -1686,10 +1853,11 @@ INSERT INTO carry (match_id,
     under_pressure,
     end_x,
     end_y
-) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
 '''
 freeze_frame = '''
-INSERT INTO freeze_frame (shot_id,
+INSERT INTO freeze_frame (
+    shot_id,
     person_id,
     x,
     y,
@@ -1697,7 +1865,8 @@ INSERT INTO freeze_frame (shot_id,
 ) VALUES (%s, %s, %s, %s, %s)
 '''
 match_ = '''
-INSERT INTO match (match_id,
+INSERT INTO match (
+    match_id,
     match_date,
     kick_off,
     country_id,
@@ -1716,4 +1885,32 @@ INSERT INTO match (match_id,
     FROM country
     WHERE country.country_name = %s
 ), %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+'''
+lineup = '''
+INSERT INTO lineup (
+    match_id,
+    person_id,
+    position_id,
+    jersey_number,
+    from_,
+    to_,
+    from_period,
+    to_period,
+    start_reason,
+    end_reason
+) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+'''
+card = '''
+INSERT INTO card (
+    match_id,
+    person_id,
+    time,
+    type_id,
+    reason,
+    period
+) VALUES (%s, %s, %s, (
+    SELECT definition_id
+    FROM definition
+    WHERE definition_name = %s
+), %s, %s)
 '''
