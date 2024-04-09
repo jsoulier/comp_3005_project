@@ -1,5 +1,6 @@
 drop = '''
 DROP TABLE IF EXISTS freeze_frame;
+DROP TABLE IF EXISTS formation;
 DROP TABLE IF EXISTS ball_recovery;
 DROP TABLE IF EXISTS dispossessed;
 DROP TABLE IF EXISTS duel;
@@ -140,6 +141,7 @@ INSERT INTO definition VALUES (15, 'Success');
 INSERT INTO definition VALUES (16, 'Success In Play');
 INSERT INTO definition VALUES (17, 'Success Out');
 INSERT INTO definition VALUES (19, '6 Seconds');
+INSERT INTO definition VALUES (2, 'Success To Opposition');
 INSERT INTO definition VALUES (20, 'Backpass Pick');
 INSERT INTO definition VALUES (21, 'Dangerous Play');
 INSERT INTO definition VALUES (22, 'Dive');
@@ -149,6 +151,7 @@ INSERT INTO definition VALUES (25, 'Collected');
 INSERT INTO definition VALUES (26, 'Goal Conceded');
 INSERT INTO definition VALUES (28, 'Penalty Conceded');
 INSERT INTO definition VALUES (29, 'Penalty Saved');
+INSERT INTO definition VALUES (3, 'Success To Team');
 INSERT INTO definition VALUES (30, 'Punch');
 INSERT INTO definition VALUES (31, 'Save');
 INSERT INTO definition VALUES (32, 'Shot Faced');
@@ -374,11 +377,21 @@ CREATE TABLE pass (
     FOREIGN KEY (technique_id) REFERENCES definition (definition_id)
 ) INHERITS (common);
 CREATE TABLE fifty_fifty (
+    outcome_id INT,
+    counter_pressure BOOLEAN,
+    FOREIGN KEY (outcome_id) REFERENCES definition (definition_id)
 ) INHERITS (common);
 CREATE TABLE half_end (
+    early_video_end BOOLEAN,
+    match_suspended BOOLEAN
 ) INHERITS (common);
 CREATE TABLE starting_xi (
-) INHERITS (common);
+    starting_xi_id INT PRIMARY KEY,
+    team_id INT,
+    season_id INT,
+    FOREIGN KEY (team_id) REFERENCES team (team_id),
+    FOREIGN KEY (season_id) REFERENCES season (season_id)
+);
 CREATE TABLE tactical_shift (
 ) INHERITS (common);
 CREATE TABLE error (
@@ -404,6 +417,15 @@ CREATE TABLE freeze_frame (
     FOREIGN KEY (shot_id) REFERENCES shot (shot_id),
     FOREIGN KEY (player_id) REFERENCES player (player_id),
     FOREIGN KEY (position_id) REFERENCES position (position_id)
+);
+CREATE TABLE formation (
+    player_id INT,
+    position_id INT,
+    jersey_number INT,
+    starting_xi_id INT,
+    FOREIGN KEY (player_id) REFERENCES player (player_id),
+    FOREIGN KEY (position_id) REFERENCES position (position_id),
+    FOREIGN KEY (starting_xi_id) REFERENCES starting_xi (starting_xi_id)
 );
 '''
 season = '''
@@ -621,28 +643,24 @@ VALUES ((
 ), %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
 '''
 fifty_fifty = '''
-INSERT INTO fifty_fifty (player_id, play_id, position_id, period, minute, second, possession, possession_id, x, y, duration, under_pressure) 
+INSERT INTO fifty_fifty (player_id, play_id, position_id, period, minute, second, possession, possession_id, x, y, duration, under_pressure, outcome_id, counter_pressure) 
 VALUES ((
     SELECT player_id 
     FROM player 
     WHERE person_id = %s AND team_id = %s AND season_id = %s 
-), %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+), %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
 '''
 half_end = '''
-INSERT INTO half_end (player_id, play_id, position_id, period, minute, second, possession, possession_id, x, y, duration, under_pressure) 
+INSERT INTO half_end (player_id, play_id, position_id, period, minute, second, possession, possession_id, x, y, duration, under_pressure, early_video_end, match_suspended) 
 VALUES ((
     SELECT player_id 
     FROM player 
     WHERE person_id = %s AND team_id = %s AND season_id = %s 
-), %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+), %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
 '''
 starting_xi = '''
-INSERT INTO starting_xi (player_id, play_id, position_id, period, minute, second, possession, possession_id, x, y, duration, under_pressure) 
-VALUES ((
-    SELECT player_id 
-    FROM player 
-    WHERE person_id = %s AND team_id = %s AND season_id = %s 
-), %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+INSERT INTO starting_xi (team_id, season_id, starting_xi_id)
+VALUES (%s, %s, %s)
 '''
 tactical_shift = '''
 INSERT INTO tactical_shift (player_id, play_id, position_id, period, minute, second, possession, possession_id, x, y, duration, under_pressure) 
@@ -715,4 +733,12 @@ VALUES ((
     FROM player 
     WHERE person_id = %s AND team_id = %s AND season_id = %s 
 ), %s, %s, %s, %s)
+'''
+formation = '''
+INSERT INTO formation (player_id, position_id, jersey_number, starting_xi_id)
+VALUES ((
+    SELECT player_id 
+    FROM player 
+    WHERE person_id = %s AND team_id = %s AND season_id = %s 
+), %s, %s, %s)
 '''
