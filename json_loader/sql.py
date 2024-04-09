@@ -1032,30 +1032,43 @@ CREATE TABLE freeze_frame (
 );
 '''
 season = '''
-INSERT INTO season (competition_name, season_name)
-VALUES (%s, %s)
+INSERT INTO season (
+    competition_name,
+    season_name
+) VALUES (%s, %s)
 ON CONFLICT ON CONSTRAINT season_unique DO UPDATE
 SET season_name = season.season_name
 RETURNING *;
 '''
 team = '''
-INSERT INTO team (team_id, team_name)
-VALUES (%s, %s)
+INSERT INTO team (
+    team_id,
+    team_name
+) VALUES (%s, %s)
 ON CONFLICT DO NOTHING;
 '''
 stadium = '''
-INSERT INTO stadium (stadium_id, stadium_name, country_id)
-VALUES (%s, %s, %s)
+INSERT INTO stadium (
+    stadium_id,
+    stadium_name,
+    country_id
+) VALUES (%s, %s, %s)
 ON CONFLICT DO NOTHING;
 '''
 country = '''
-INSERT INTO country (country_id, country_name)
-VALUES (%s, %s)
+INSERT INTO country (
+    country_id,
+    country_name
+) VALUES (%s, %s)
 ON CONFLICT DO NOTHING;
 '''
 person = '''
-INSERT INTO person (person_id, person_name, person_nickname, country_id)
-VALUES (%s, %s, %s, %s)
+INSERT INTO person (
+    person_id,
+    person_name,
+    person_nickname,
+    country_id
+) VALUES (%s, %s, %s, %s)
 ON CONFLICT DO NOTHING;
 '''
 ball_recovery = '''
@@ -1078,144 +1091,627 @@ INSERT INTO ball_recovery (
 ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
 '''
 dispossessed = '''
-INSERT INTO dispossessed (match_id, person_id, play_id, position_id, period, minute, second, possession, possession_id, x, y, duration, under_pressure)
-VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+INSERT INTO dispossessed (
+    match_id,
+    person_id,
+    play_id,
+    position_id,
+    period,
+    minute,
+    second,
+    possession,
+    possession_id,
+    x,
+    y,
+    duration,
+    under_pressure
+) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
 '''
 duel = '''
-INSERT INTO duel (match_id, person_id, play_id, position_id, period, minute, second, possession, possession_id, x, y, duration, under_pressure, counter_pressure, type_id, outcome_id)
-VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+INSERT INTO duel (match_id,
+    person_id,
+    play_id,
+    position_id,
+    period,
+    minute,
+    second,
+    possession,
+    possession_id,
+    x,
+    y,
+    duration,
+    under_pressure,
+    counter_pressure,
+    type_id,
+    outcome_id
+) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
 '''
 camera_on = '''
-INSERT INTO camera_on (match_id, person_id, play_id, position_id, period, minute, second, possession, possession_id, x, y, duration, under_pressure)
-VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+INSERT INTO camera_on (match_id,
+    person_id,
+    play_id,
+    position_id,
+    period,
+    minute,
+    second,
+    possession,
+    possession_id,
+    x,
+    y,
+    duration,
+    under_pressure
+) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
 '''
 block = '''
-INSERT INTO block (match_id, person_id, play_id, position_id, period, minute, second, possession, possession_id, x, y, duration, under_pressure, counter_pressure, deflection, offensive, save_block)
-VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+INSERT INTO block (match_id,
+    person_id,
+    play_id,
+    position_id,
+    period,
+    minute,
+    second,
+    possession,
+    possession_id,
+    x,
+    y,
+    duration,
+    under_pressure,
+    counter_pressure,
+    deflection,
+    offensive,
+    save_block
+) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
 '''
 offside = '''
-INSERT INTO offside (match_id, person_id, play_id, position_id, period, minute, second, possession, possession_id, x, y, duration, under_pressure)
-VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+INSERT INTO offside (match_id,
+    person_id,
+    play_id,
+    position_id,
+    period,
+    minute,
+    second,
+    possession,
+    possession_id,
+    x,
+    y,
+    duration,
+    under_pressure
+) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
 '''
 clearance = '''
-INSERT INTO clearance (match_id, person_id, play_id, position_id, period, minute, second, possession, possession_id, x, y, duration, under_pressure, aerial_won, body_part_id)
-VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+INSERT INTO clearance (match_id,
+    person_id,
+    play_id,
+    position_id,
+    period,
+    minute,
+    second,
+    possession,
+    possession_id,
+    x,
+    y,
+    duration,
+    under_pressure,
+    aerial_won,
+    body_part_id
+) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
 '''
 interception = '''
-INSERT INTO interception (match_id, person_id, play_id, position_id, period, minute, second, possession, possession_id, x, y, duration, under_pressure)
-VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+INSERT INTO interception (match_id,
+    person_id,
+    play_id,
+    position_id,
+    period,
+    minute,
+    second,
+    possession,
+    possession_id,
+    x,
+    y,
+    duration,
+    under_pressure
+) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
 '''
 dribble = '''
-INSERT INTO dribble (match_id, person_id, play_id, position_id, period, minute, second, possession, possession_id, x, y, duration, under_pressure, overrun, nutmeg, no_touch, outcome_id)
-VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+INSERT INTO dribble (match_id,
+    person_id,
+    play_id,
+    position_id,
+    period,
+    minute,
+    second,
+    possession,
+    possession_id,
+    x,
+    y,
+    duration,
+    under_pressure,
+    overrun,
+    nutmeg,
+    no_touch,
+    outcome_id
+) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
 '''
 shot = '''
-INSERT INTO shot (match_id, person_id, play_id, position_id, period, minute, second, possession, possession_id, x, y, duration, under_pressure, shot_id, xg, first_time, end_x, end_y, end_z, aerial_won, follows_dribble, open_goal, deflected, technique_id, body_part_id, type_id, outcome_id)
-VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+INSERT INTO shot (match_id,
+    person_id,
+    play_id,
+    position_id,
+    period,
+    minute,
+    second,
+    possession,
+    possession_id,
+    x,
+    y,
+    duration,
+    under_pressure,
+    shot_id,
+    xg,
+    first_time,
+    end_x,
+    end_y,
+    end_z,
+    aerial_won,
+    follows_dribble,
+    open_goal,
+    deflected,
+    technique_id,
+    body_part_id,
+    type_id,
+    outcome_id
+) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
 '''
 pressure = '''
-INSERT INTO pressure (match_id, person_id, play_id, position_id, period, minute, second, possession, possession_id, x, y, duration, under_pressure, counter_pressure)
-VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+INSERT INTO pressure (match_id,
+    person_id,
+    play_id,
+    position_id,
+    period,
+    minute,
+    second,
+    possession,
+    possession_id,
+    x,
+    y,
+    duration,
+    under_pressure,
+    counter_pressure
+) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
 '''
 half_start = '''
-INSERT INTO half_start (match_id, person_id, play_id, position_id, period, minute, second, possession, possession_id, x, y, duration, under_pressure, late_video_start)
-VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+INSERT INTO half_start (match_id,
+    person_id,
+    play_id,
+    position_id,
+    period,
+    minute,
+    second,
+    possession,
+    possession_id,
+    x,
+    y,
+    duration,
+    under_pressure,
+    late_video_start
+) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
 '''
 substitution = '''
-INSERT INTO substitution (match_id, person_id, play_id, position_id, period, minute, second, possession, possession_id, x, y, duration, under_pressure, replacement_id, outcome_id)
-VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+INSERT INTO substitution (match_id,
+    person_id,
+    play_id,
+    position_id,
+    period,
+    minute,
+    second,
+    possession,
+    possession_id,
+    x,
+    y,
+    duration,
+    under_pressure,
+    replacement_id,
+    outcome_id
+) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
 '''
 own_goal_against = '''
-INSERT INTO own_goal_against (match_id, person_id, play_id, position_id, period, minute, second, possession, possession_id, x, y, duration, under_pressure)
-VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+INSERT INTO own_goal_against (match_id,
+    person_id,
+    play_id,
+    position_id,
+    period,
+    minute,
+    second,
+    possession,
+    possession_id,
+    x,
+    y,
+    duration,
+    under_pressure
+) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
 '''
 foul_won = '''
-INSERT INTO foul_won (match_id, person_id, play_id, position_id, period, minute, second, possession, possession_id, x, y, duration, under_pressure, defensive, advantage, penalty)
-VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+INSERT INTO foul_won (match_id,
+    person_id,
+    play_id,
+    position_id,
+    period,
+    minute,
+    second,
+    possession,
+    possession_id,
+    x,
+    y,
+    duration,
+    under_pressure,
+    defensive,
+    advantage,
+    penalty
+) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
 '''
 foul_committed = '''
-INSERT INTO foul_committed (match_id, person_id, play_id, position_id, period, minute, second, possession, possession_id, x, y, duration, under_pressure, counter_pressure, offensive, type_id, advantage, penalty, card_id)
-VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+INSERT INTO foul_committed (match_id,
+    person_id,
+    play_id,
+    position_id,
+    period,
+    minute,
+    second,
+    possession,
+    possession_id,
+    x,
+    y,
+    duration,
+    under_pressure,
+    counter_pressure,
+    offensive,
+    type_id,
+    advantage,
+    penalty,
+    card_id
+) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
 '''
 goal_keeper = '''
-INSERT INTO goal_keeper (match_id, person_id, play_id, position_id, period, minute, second, possession, possession_id, x, y, duration, under_pressure, stance_id, technique_id, body_part_id, type_id, outcome_id)
-VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+INSERT INTO goal_keeper (match_id,
+    person_id,
+    play_id,
+    position_id,
+    period,
+    minute,
+    second,
+    possession,
+    possession_id,
+    x,
+    y,
+    duration,
+    under_pressure,
+    stance_id,
+    technique_id,
+    body_part_id,
+    type_id,
+    outcome_id
+) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
 '''
 bad_behaviour = '''
-INSERT INTO bad_behaviour (match_id, person_id, play_id, position_id, period, minute, second, possession, possession_id, x, y, duration, under_pressure, card_id)
-VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+INSERT INTO bad_behaviour (match_id,
+    person_id,
+    play_id,
+    position_id,
+    period,
+    minute,
+    second,
+    possession,
+    possession_id,
+    x,
+    y,
+    duration,
+    under_pressure,
+    card_id
+) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
 '''
 own_goal_for = '''
-INSERT INTO own_goal_for (match_id, person_id, play_id, position_id, period, minute, second, possession, possession_id, x, y, duration, under_pressure, team_id)
-VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+INSERT INTO own_goal_for (match_id,
+    person_id,
+    play_id,
+    position_id,
+    period,
+    minute,
+    second,
+    possession,
+    possession_id,
+    x,
+    y,
+    duration,
+    under_pressure,
+    team_id
+) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
 '''
 player_on = '''
-INSERT INTO player_on (match_id, person_id, play_id, position_id, period, minute, second, possession, possession_id, x, y, duration, under_pressure)
-VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+INSERT INTO player_on (match_id,
+    person_id,
+    play_id,
+    position_id,
+    period,
+    minute,
+    second,
+    possession,
+    possession_id,
+    x,
+    y,
+    duration,
+    under_pressure
+) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
 '''
 player_off = '''
-INSERT INTO player_off (match_id, person_id, play_id, position_id, period, minute, second, possession, possession_id, x, y, duration, under_pressure, permanent)
-VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+INSERT INTO player_off (match_id,
+    person_id,
+    play_id,
+    position_id,
+    period,
+    minute,
+    second,
+    possession,
+    possession_id,
+    x,
+    y,
+    duration,
+    under_pressure,
+    permanent
+) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
 '''
 shield = '''
-INSERT INTO shield (match_id, person_id, play_id, position_id, period, minute, second, possession, possession_id, x, y, duration, under_pressure)
-VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+INSERT INTO shield (match_id,
+    person_id,
+    play_id,
+    position_id,
+    period,
+    minute,
+    second,
+    possession,
+    possession_id,
+    x,
+    y,
+    duration,
+    under_pressure
+) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
 '''
 pass_ = '''
-INSERT INTO pass (match_id, person_id, play_id, position_id, period, minute, second, possession, possession_id, x, y, duration, under_pressure, recipient_id, length, angle, height_id, end_x, end_y, backheel, deflected, miscommunication, cross_, cut_back, switch, shot_assist, goal_assist, body_part_id, type_id, outcome_id, technique_id, off_camera)
-VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+INSERT INTO pass (match_id,
+    person_id,
+    play_id,
+    position_id,
+    period,
+    minute,
+    second,
+    possession,
+    possession_id,
+    x,
+    y,
+    duration,
+    under_pressure,
+    recipient_id,
+    length,
+    angle,
+    height_id,
+    end_x,
+    end_y,
+    backheel,
+    deflected,
+    miscommunication,
+    cross_,
+    cut_back,
+    switch,
+    shot_assist,
+    goal_assist,
+    body_part_id,
+    type_id,
+    outcome_id,
+    technique_id,
+    off_camera
+) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
 '''
 fifty_fifty = '''
-INSERT INTO fifty_fifty (match_id, person_id, play_id, position_id, period, minute, second, possession, possession_id, x, y, duration, under_pressure, outcome_id, counter_pressure)
-VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+INSERT INTO fifty_fifty (match_id,
+    person_id,
+    play_id,
+    position_id,
+    period,
+    minute,
+    second,
+    possession,
+    possession_id,
+    x,
+    y,
+    duration,
+    under_pressure,
+    outcome_id,
+    counter_pressure
+) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
 '''
 half_end = '''
-INSERT INTO half_end (match_id, person_id, play_id, position_id, period, minute, second, possession, possession_id, x, y, duration, under_pressure, early_video_end, match_suspended)
-VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+INSERT INTO half_end (match_id,
+    person_id,
+    play_id,
+    position_id,
+    period,
+    minute,
+    second,
+    possession,
+    possession_id,
+    x,
+    y,
+    duration,
+    under_pressure,
+    early_video_end,
+    match_suspended
+) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
 '''
 starting_xi = '''
-INSERT INTO starting_xi (match_id, person_id, position_id, jersey_number)
-VALUES (%s, %s, %s, %s)
+INSERT INTO starting_xi (match_id,
+    person_id,
+    position_id,
+    jersey_number
+) VALUES (%s, %s, %s, %s)
 '''
 tactical_shift = '''
-INSERT INTO tactical_shift (match_id, person_id, play_id, position_id, period, minute, second, possession, possession_id, x, y, duration, under_pressure)
-VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+INSERT INTO tactical_shift (match_id,
+    person_id,
+    play_id,
+    position_id,
+    period,
+    minute,
+    second,
+    possession,
+    possession_id,
+    x,
+    y,
+    duration,
+    under_pressure
+) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
 '''
 error = '''
-INSERT INTO error (match_id, person_id, play_id, position_id, period, minute, second, possession, possession_id, x, y, duration, under_pressure)
-VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+INSERT INTO error (match_id,
+    person_id,
+    play_id,
+    position_id,
+    period,
+    minute,
+    second,
+    possession,
+    possession_id,
+    x,
+    y,
+    duration,
+    under_pressure
+) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
 '''
 miscontrol = '''
-INSERT INTO miscontrol (match_id, person_id, play_id, position_id, period, minute, second, possession, possession_id, x, y, duration, under_pressure, aerial_won)
-VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+INSERT INTO miscontrol (match_id,
+    person_id,
+    play_id,
+    position_id,
+    period,
+    minute,
+    second,
+    possession,
+    possession_id,
+    x,
+    y,
+    duration,
+    under_pressure,
+    aerial_won
+) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
 '''
 dribbled_past = '''
-INSERT INTO dribbled_past (match_id, person_id, play_id, position_id, period, minute, second, possession, possession_id, x, y, duration, under_pressure, counter_pressure)
-VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+INSERT INTO dribbled_past (match_id,
+    person_id,
+    play_id,
+    position_id,
+    period,
+    minute,
+    second,
+    possession,
+    possession_id,
+    x,
+    y,
+    duration,
+    under_pressure,
+    counter_pressure
+) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
 '''
 injury_stoppage = '''
-INSERT INTO injury_stoppage (match_id, person_id, play_id, position_id, period, minute, second, possession, possession_id, x, y, duration, under_pressure, in_chain)
-VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+INSERT INTO injury_stoppage (match_id,
+    person_id,
+    play_id,
+    position_id,
+    period,
+    minute,
+    second,
+    possession,
+    possession_id,
+    x,
+    y,
+    duration,
+    under_pressure,
+    in_chain
+) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
 '''
 referee_ball_drop = '''
-INSERT INTO referee_ball_drop (match_id, person_id, play_id, position_id, period, minute, second, possession, possession_id, x, y, duration, under_pressure, off_camera)
-VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+INSERT INTO referee_ball_drop (match_id,
+    person_id,
+    play_id,
+    position_id,
+    period,
+    minute,
+    second,
+    possession,
+    possession_id,
+    x,
+    y,
+    duration,
+    under_pressure,
+    off_camera
+) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
 '''
 ball_receipt = '''
-INSERT INTO ball_receipt (match_id, person_id, play_id, position_id, period, minute, second, possession, possession_id, x, y, duration, under_pressure, outcome_id)
-VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+INSERT INTO ball_receipt (match_id,
+    person_id,
+    play_id,
+    position_id,
+    period,
+    minute,
+    second,
+    possession,
+    possession_id,
+    x,
+    y,
+    duration,
+    under_pressure,
+    outcome_id
+) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
 '''
 carry = '''
-INSERT INTO carry (match_id, person_id, play_id, position_id, period, minute, second, possession, possession_id, x, y, duration, under_pressure, end_x, end_y)
-VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+INSERT INTO carry (match_id,
+    person_id,
+    play_id,
+    position_id,
+    period,
+    minute,
+    second,
+    possession,
+    possession_id,
+    x,
+    y,
+    duration,
+    under_pressure,
+    end_x,
+    end_y
+) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
 '''
 freeze_frame = '''
-INSERT INTO freeze_frame (shot_id, person_id, x, y, position_id)
-VALUES (%s, %s, %s, %s, %s)
+INSERT INTO freeze_frame (shot_id,
+    person_id,
+    x,
+    y,
+    position_id
+) VALUES (%s, %s, %s, %s, %s)
 '''
 match_ = '''
-INSERT INTO match (match_id, match_date, kick_off, country_id, season_id, home_team_id, away_team_id, home_team_gender, away_team_gender, home_score, away_score, match_week, competition_stage, stadium_id)
-VALUES (%s, %s, %s, (
+INSERT INTO match (match_id,
+    match_date,
+    kick_off,
+    country_id,
+    season_id,
+    home_team_id,
+    away_team_id,
+    home_team_gender,
+    away_team_gender,
+    home_score,
+    away_score,
+    match_week,
+    competition_stage,
+    stadium_id
+) VALUES (%s, %s, %s, (
     SELECT country_id
     FROM country
     WHERE country.country_name = %s
