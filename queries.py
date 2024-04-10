@@ -1,7 +1,7 @@
 # Created by Gabriel Martell
 
 '''
-Version 1.1 (04/02/2024)
+Version 1.11 (04/02/2024)
 =========================================================
 queries.py (Carleton University COMP3005 - Database Management Student Template Code)
 
@@ -66,14 +66,9 @@ def load_database(cursor, conn):
     
     # Import the dbexport.sql database data into this database
     try:
-        # command = f'psql -h {host} -U {user} -d {query_database_name} -a -f {os.path.join(dir_path, "dbexport.sql")}'
-        # env = {'PGPASSWORD': password}
-        # subprocess.run(command, shell=True, check=True, env=env)
         command = f'psql -h {host} -U {user} -d {query_database_name} -a -f {os.path.join(dir_path, "dbexport.sql")}'
         env = {'PGPASSWORD': password}
-        env['PATH'] = os.environ['PATH']
-        env['SYSTEMROOT'] = os.environ['SYSTEMROOT']
-        subprocess.run(command, shell=True, check=True, env=env, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+        subprocess.run(command, shell=True, check=True, env=env)
 
     except subprocess.CalledProcessError as e:
         print(f"An error occurred while loading the database: {e}")
@@ -110,31 +105,6 @@ def reconnect(cursor, conn):
 
 # Getting the execution time of the query through EXPLAIN ANALYZE - Do NOT Modify
 #================================================
-# def get_time(cursor, conn, sql_query):
-#     # Prefix your query with EXPLAIN ANALYZE
-#     explain_query = f"EXPLAIN ANALYZE {sql_query}"
-
-#     try:
-#         # Execute the EXPLAIN ANALYZE query
-#         cursor.execute(explain_query)
-        
-#         # Fetch all rows from the cursor
-#         explain_output = cursor.fetchall()
-        
-#         # Convert the output tuples to a single string
-#         explain_text = "\n".join([row[0] for row in explain_output])
-        
-#         # Use regular expression to find the execution time
-#         # Look for the pattern "Execution Time: <time> ms"
-#         match = re.search(r"Execution Time: ([\d.]+) ms", explain_text)
-#         if match:
-#             execution_time = float(match.group(1))
-#             return f"Execution Time: {execution_time} ms"
-#         else:
-#             print("Execution Time not found in EXPLAIN ANALYZE output.")
-#             return f"NA"
-#     except:
-#         print("[ERROR] Error getting time.")
 def get_time(cursor, conn, sql_query):
     # Prefix your query with EXPLAIN ANALYZE
     explain_query = f"EXPLAIN ANALYZE {sql_query}"
@@ -158,9 +128,8 @@ def get_time(cursor, conn, sql_query):
         else:
             print("Execution Time not found in EXPLAIN ANALYZE output.")
             return f"NA"
-    except Exception as error:
+    except:
         print("[ERROR] Error getting time.")
-        print(error)
 
 
 # Write the results into some Q_n CSV. If the is an error with the query, it is a INC result - Do NOT Modify
@@ -172,7 +141,6 @@ def write_csv(execution_time, cursor, conn, i):
         rows = cursor.fetchall()
         filename = f"{dir_path}/Q_{i}.csv"
 
-        # with open(filename, 'w', newline='') as csvfile:
         with open(filename, 'w', encoding='utf-8', newline='') as csvfile:
             csvwriter = csv.writer(csvfile)
             
@@ -286,14 +254,14 @@ def Q_4(cursor, conn, execution_time):
     # Enter QUERY within the quotes:
     
     query = """
-    SELECT team.team_name, COUNT(*) AS passes 
+    SELECT team.team_name, COUNT(pass.team_id) AS passes 
     FROM pass
     JOIN team ON pass.team_id = team.team_id
     JOIN match ON match.match_id = pass.match_id
     JOIN season ON match.season_id = season.season_id 
     WHERE season.competition_name = 'La Liga' AND season.season_name = '2020/2021' 
     GROUP BY team.team_id, team.team_name 
-    HAVING COUNT(*) > 0
+    HAVING COUNT(pass.team_id) > 0
     ORDER BY passes DESC;
     """
 
@@ -452,7 +420,7 @@ def Q_10(cursor, conn, execution_time):
 
     #==========================================================================    
     # Enter QUERY within the quotes:
-
+    
     query = """
     SELECT person.person_name, COUNT(dribbled_past.person_id) AS dribbled_pasts 
     FROM person 
@@ -504,7 +472,6 @@ try:
         host = db_host
         port = db_port
 
-        # conn = psycopg.connect(dbname=dbname, user=user, password=password, host=host, port=port)
         conn = psycopg.connect(dbname=dbname, user=user, password=password, host=host, port=port)
         cursor = conn.cursor()
         
