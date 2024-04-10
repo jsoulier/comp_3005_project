@@ -170,7 +170,7 @@ def write_csv(execution_time, cursor, conn, i):
     try:
         colnames = [desc[0] for desc in cursor.description]
         rows = cursor.fetchall()
-        filename = f"{dir_path}/Q_{i}_.csv"
+        filename = f"{dir_path}/Q_{i}.csv"
 
         # with open(filename, 'w', newline='') as csvfile:
         with open(filename, 'w', encoding='utf-8', newline='') as csvfile:

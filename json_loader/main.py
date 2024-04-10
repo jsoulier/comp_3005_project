@@ -321,7 +321,7 @@ def populate(cursor):
                     duration = item.get('duration', 0)
                     under_pressure = 'under_pressure' in item
                     counter_pressure = 'counterpress' in item
-                    off_camera = 'off_camera' in item
+                    off_camera = item.get('off_camera', False)
                     common = (
                         match_id,
                         team_id,
@@ -682,6 +682,7 @@ def main():
     cursor = connection.cursor()
     cursor.execute(sql.drop)
     cursor.execute(sql.create)
+    cursor.execute(sql.insert)
     populate(cursor)
     
     # export sql
